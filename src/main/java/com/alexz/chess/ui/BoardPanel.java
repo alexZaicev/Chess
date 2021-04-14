@@ -6,6 +6,7 @@ import com.alexz.chess.models.board.IBoardListener;
 import com.alexz.chess.models.board.Tile;
 import com.alexz.chess.models.pieces.IPiece;
 import com.alexz.chess.models.pieces.PieceColor;
+import com.alexz.chess.services.BoardService;
 import com.alexz.chess.services.CfgProvider;
 import com.alexz.chess.ui.widgets.Button;
 import com.alexz.chess.ui.widgets.Label;
@@ -15,13 +16,11 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 public class BoardPanel extends JPanel implements IBoardListener {
 
   private static final Logger _logger = LogManager.getLogger(BoardPanel.class);
   private Board board;
-  private Button selectedBtn;
 
   public BoardPanel() {
     super();
@@ -101,25 +100,26 @@ public class BoardPanel extends JPanel implements IBoardListener {
         final IPiece piece = this.board.getBoard().get(tile);
         final Button btn = new Button(piece == null ? "" : piece.toString());
         btn.setBackground(this.getBtnColor(tile));
-        if (piece != null) {
-          btn.setForeground(
-              (Color)
-                  CfgProvider.getInstance()
-                      .get(
-                          piece.getPieceColor() == PieceColor.WHITE
-                              ? ConfigKey.COLOR_PIECE_WHITE
-                              : ConfigKey.COLOR_PIECE_BLACK));
+
+        if (piece != null
+            || this.board.getAvailableMoves().contains(tile)
+            || this.board.getAvailableAttackMoves().contains(tile)) {
+          if (piece != null) {
+            btn.setForeground(
+                (Color)
+                    CfgProvider.getInstance()
+                        .get(
+                            piece.getPieceColor() == PieceColor.WHITE
+                                ? ConfigKey.COLOR_PIECE_WHITE
+                                : ConfigKey.COLOR_PIECE_BLACK));
+          }
           btn.setEnabled(true);
           btn.setOnClick(
               obj -> {
-                if (this.selectedBtn == null) {
-                  this.selectedBtn = btn;
-                  this.highlightAvailableMoves(piece);
-                } else {
-                  this.selectedBtn = null;
-                  // TODO make move
-                }
+                _logger.debug("Tile pressed [" + tile + "]");
+                BoardService.getInstance().onPlayerAction(tile, piece);
               });
+
         } else {
           btn.setEnabled(false);
         }
@@ -152,12 +152,14 @@ public class BoardPanel extends JPanel implements IBoardListener {
       }
       white = !white;
     }
+    if (this.board.getAvailableMoves().contains(tile)) {
+      return Color.green;
+    }
+    if (this.board.getAvailableAttackMoves().contains(tile)) {
+      return Color.red;
+    }
     return (Color)
         CfgProvider.getInstance()
             .get(white ? ConfigKey.COLOR_TILE_WHITE : ConfigKey.COLOR_TILE_BLACK);
-  }
-
-  private void highlightAvailableMoves(final IPiece piece) {
-    final List<Tile> availableMoves = piece.getAvailableMoves(this.board.getBoard());
   }
 }

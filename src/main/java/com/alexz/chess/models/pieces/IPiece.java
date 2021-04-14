@@ -10,5 +10,13 @@ public interface IPiece extends Serializable {
 
   PieceColor getPieceColor();
 
+  List<Tile> getAttackMoves(final Map<Tile, IPiece> board);
+
+  List<Tile> getAttackMoves(final Map<Tile, IPiece> board, final boolean isBot);
+
   List<Tile> getAvailableMoves(final Map<Tile, IPiece> board);
+
+  List<Tile> getAvailableMoves(final Map<Tile, IPiece> board, final boolean isBot);
+
+  void postMoveUpdate();
 }

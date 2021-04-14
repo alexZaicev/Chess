@@ -50,7 +50,7 @@ public class BotWorker extends SwingWorker<Void, Void> {
         }
       }
     } catch (final Exception ex) {
-      _logger.error(ex.getMessage());
+      _logger.error(ex);
     }
     return null;
   }
@@ -61,6 +61,6 @@ public class BotWorker extends SwingWorker<Void, Void> {
       _logger.error("Failed to generate next move");
       return;
     }
-    BoardService.getInstance().onPlayerAction(this.nextMove);
+    BoardService.getInstance().onMoveAction(this.nextMove);
   }
 }

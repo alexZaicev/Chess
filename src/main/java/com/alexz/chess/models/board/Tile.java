@@ -72,9 +72,9 @@ public enum Tile {
   H8,
   ;
 
-  public static List<Tile> getInitialPawnPositions(final PieceColor pieceColor) {
+  public static List<Tile> getInitialPawnPositions(final boolean isBot) {
     final List<Tile> positions = new ArrayList<>();
-    final String s = pieceColor == PieceColor.WHITE ? "2" : "7";
+    final String s = isBot ? "2" : "7";
     for (final Tile t : Tile.values()) {
       if (t.name().endsWith(s)) {
         positions.add(t);
@@ -83,40 +83,40 @@ public enum Tile {
     return positions;
   }
 
-  public static List<Tile> getInitialRookPositions(final PieceColor pieceColor) {
+  public static List<Tile> getInitialRookPositions(final boolean isBot) {
     final List<Tile> positions = new ArrayList<>();
-    final String s = pieceColor == PieceColor.WHITE ? "1" : "8";
+    final String s = isBot ? "1" : "8";
     positions.add(Tile.valueOf(String.format("%s%s", "A", s)));
     positions.add(Tile.valueOf(String.format("%s%s", "H", s)));
     return positions;
   }
 
-  public static List<Tile> getInitialKnightPositions(final PieceColor pieceColor) {
+  public static List<Tile> getInitialKnightPositions(final boolean isBot) {
     final List<Tile> positions = new ArrayList<>();
-    final String s = pieceColor == PieceColor.WHITE ? "1" : "8";
+    final String s = isBot ? "1" : "8";
     positions.add(Tile.valueOf(String.format("%s%s", "B", s)));
     positions.add(Tile.valueOf(String.format("%s%s", "G", s)));
     return positions;
   }
 
-  public static List<Tile> getInitialBishopPositions(final PieceColor pieceColor) {
+  public static List<Tile> getInitialBishopPositions(final boolean isBot) {
     final List<Tile> positions = new ArrayList<>();
-    final String s = pieceColor == PieceColor.WHITE ? "1" : "8";
+    final String s = isBot ? "1" : "8";
     positions.add(Tile.valueOf(String.format("%s%s", "C", s)));
     positions.add(Tile.valueOf(String.format("%s%s", "F", s)));
     return positions;
   }
 
-  public static List<Tile> getInitialQueenPositions(final PieceColor pieceColor) {
+  public static List<Tile> getInitialQueenPositions(final boolean isBot) {
     final List<Tile> positions = new ArrayList<>();
-    final String s = pieceColor == PieceColor.WHITE ? "1" : "8";
+    final String s = isBot ? "1" : "8";
     positions.add(Tile.valueOf(String.format("%s%s", "D", s)));
     return positions;
   }
 
-  public static List<Tile> getInitialKingPositions(final PieceColor pieceColor) {
+  public static List<Tile> getInitialKingPositions(final boolean isBot) {
     final List<Tile> positions = new ArrayList<>();
-    final String s = pieceColor == PieceColor.WHITE ? "1" : "8";
+    final String s = isBot ? "1" : "8";
     positions.add(Tile.valueOf(String.format("%s%s", "E", s)));
     return positions;
   }
