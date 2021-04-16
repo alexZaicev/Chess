@@ -12,7 +12,7 @@ public class Pawn extends PieceBase {
 
   private boolean firstMove;
 
-  public Pawn(PieceColor color) {
+  public Pawn(final PieceColor color) {
     super(color);
     this.firstMove = true;
   }
@@ -23,12 +23,12 @@ public class Pawn extends PieceBase {
   }
 
   @Override
-  public List<Tile> getAttackMoves(Map<Tile, IPiece> board) {
+  public List<Tile> getAttackMoves(final Map<Tile, IPiece> board) {
     return this.getAttackMoves(board, false);
   }
 
   @Override
-  public List<Tile> getAttackMoves(Map<Tile, IPiece> board, final boolean isBot) {
+  public List<Tile> getAttackMoves(final Map<Tile, IPiece> board, final boolean isBot) {
     final List<Tile> attackMoves = new ArrayList<>();
     final Tile currentPos = this.getCurrentPosition(board);
 
@@ -52,12 +52,12 @@ public class Pawn extends PieceBase {
   }
 
   @Override
-  public List<Tile> getAvailableMoves(Map<Tile, IPiece> board) {
+  public List<Tile> getAvailableMoves(final Map<Tile, IPiece> board) {
     return this.getAvailableMoves(board, false);
   }
 
   @Override
-  public List<Tile> getAvailableMoves(Map<Tile, IPiece> board, boolean isBot) {
+  public List<Tile> getAvailableMoves(final Map<Tile, IPiece> board, final boolean isBot) {
     final List<Tile> moves = new ArrayList<>();
     final Tile currentPos = this.getCurrentPosition(board);
 
@@ -89,17 +89,44 @@ public class Pawn extends PieceBase {
     return firstMove;
   }
 
-  public void setFirstMove(boolean firstMove) {
+  public void setFirstMove(final boolean firstMove) {
     this.firstMove = firstMove;
   }
 
+  protected boolean addAttackMove(
+      final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
+    if (this.isColRowOutOfBounds(column, row)) {
+      return false;
+    }
+    final Tile move = Tile.valueOf(String.format("%s%d", column, row));
+    final IPiece piece = board.get(move);
+    if (piece != null && piece.getPieceColor() != this.getPieceColor()) {
+      moves.add(move);
+      return true;
+    }
+    return false;
+  }
+
+  protected boolean addMove(
+      final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
+    if (this.isColRowOutOfBounds(column, row)) {
+      return false;
+    }
+    final Tile move = Tile.valueOf(String.format("%s%d", column, row));
+    if (board.get(move) == null) {
+      moves.add(move);
+      return true;
+    }
+    return false;
+  }
+
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o) return true;
 
     if (!(o instanceof Pawn)) return false;
 
-    Pawn pawn = (Pawn) o;
+    final Pawn pawn = (Pawn) o;
 
     return new EqualsBuilder()
         .appendSuper(super.equals(o))

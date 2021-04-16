@@ -71,37 +71,6 @@ public class Rook extends PieceBase {
   }
 
   @Override
-  protected boolean addMove(
-      final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
-    if (this.isColRowOutOfBounds(column, row)) {
-      return false;
-    }
-    final Tile move = Tile.valueOf(String.format("%s%d", column, row));
-    if (board.get(move) != null) {
-      return false;
-    }
-    moves.add(move);
-    return true;
-  }
-
-  @Override
-  protected boolean addAttackMove(
-      final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
-    if (this.isColRowOutOfBounds(column, row)) {
-      return false;
-    }
-    final Tile move = Tile.valueOf(String.format("%s%d", column, row));
-    final IPiece piece = board.get(move);
-    if (piece == null) {
-      return true;
-    }
-    if (piece.getPieceColor() != this.getPieceColor()) {
-      moves.add(move);
-    }
-    return false;
-  }
-
-  @Override
   public void postMoveUpdate() {
     this.setFirstMove(false);
   }

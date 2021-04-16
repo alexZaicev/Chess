@@ -38,6 +38,19 @@ public abstract class PieceBase implements IPiece {
     return currentPos;
   }
 
+  protected boolean addMove(
+      final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
+    if (this.isColRowOutOfBounds(column, row)) {
+      return false;
+    }
+    final Tile move = Tile.valueOf(String.format("%s%d", column, row));
+    if (board.get(move) != null) {
+      return false;
+    }
+    moves.add(move);
+    return true;
+  }
+
   protected boolean addAttackMove(
       final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
     if (this.isColRowOutOfBounds(column, row)) {
@@ -45,22 +58,11 @@ public abstract class PieceBase implements IPiece {
     }
     final Tile move = Tile.valueOf(String.format("%s%d", column, row));
     final IPiece piece = board.get(move);
-    if (piece != null && piece.getPieceColor() != this.getPieceColor()) {
-      moves.add(move);
+    if (piece == null) {
       return true;
     }
-    return false;
-  }
-
-  protected boolean addMove(
-      final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
-    if (this.isColRowOutOfBounds(column, row)) {
-      return false;
-    }
-    final Tile move = Tile.valueOf(String.format("%s%d", column, row));
-    if (board.get(move) == null) {
+    if (piece.getPieceColor() != this.getPieceColor()) {
       moves.add(move);
-      return true;
     }
     return false;
   }
