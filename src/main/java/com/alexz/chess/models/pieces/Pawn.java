@@ -33,36 +33,19 @@ public class Pawn extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      String column = currentPos.name().substring(0, 1);
-      final int row = Integer.parseInt(currentPos.name().substring(1));
-      final int i = column.charAt(0);
+      final char column = currentPos.name().charAt(0);
+      final int row;
       if (isBot) {
-        // attack moves
-        if (i == 'A') {
-          column = Character.toString((char) (i + 1));
-          this.addAttackMove(column, row + 1, board, attackMoves);
-        } else if (i == 'H') {
-          column = Character.toString((char) (i - 1));
-          this.addAttackMove(column, row + 1, board, attackMoves);
-        } else {
-          column = Character.toString((char) (i + 1));
-          this.addAttackMove(column, row + 1, board, attackMoves);
-          column = Character.toString((char) (i - 1));
-          this.addAttackMove(column, row + 1, board, attackMoves);
-        }
+        row = Integer.parseInt(currentPos.name().substring(1)) + 1;
       } else {
-        if (i == 'A') {
-          column = Character.toString((char) (i + 1));
-          this.addAttackMove(column, row - 1, board, attackMoves);
-        } else if (i == 'H') {
-          column = Character.toString((char) (i - 1));
-          this.addAttackMove(column, row - 1, board, attackMoves);
-        } else {
-          column = Character.toString((char) (i + 1));
-          this.addAttackMove(column, row - 1, board, attackMoves);
-          column = Character.toString((char) (i - 1));
-          this.addAttackMove(column, row - 1, board, attackMoves);
-        }
+        row = Integer.parseInt(currentPos.name().substring(1)) - 1;
+      }
+
+      if (column != 'H') {
+        this.addAttackMove((char) (column + 1), row, board, attackMoves);
+      }
+      if (column != 'A') {
+        this.addAttackMove((char) (column - 1), row, board, attackMoves);
       }
     }
     return attackMoves;
@@ -79,7 +62,7 @@ public class Pawn extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      String column = currentPos.name().substring(0, 1);
+      final char column = currentPos.name().charAt(0);
       final int row = Integer.parseInt(currentPos.name().substring(1));
 
       if (isBot) {

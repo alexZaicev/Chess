@@ -12,6 +12,7 @@ public enum ConfigKey {
   FONT_H5("font.h5"),
   FONT_H6("font.h6"),
   FONT_P("font.p"),
+  FONT_P_BOLD("font.pb"),
   COLOR_TILE_WHITE("color.tile.white"),
   COLOR_TILE_BLACK("color.tile.black"),
   COLOR_PIECE_WHITE("color.piece.white"),

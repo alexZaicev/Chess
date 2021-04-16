@@ -1,7 +1,5 @@
 package com.alexz.chess.models.board;
 
-import com.alexz.chess.models.pieces.PieceColor;
-
 import java.util.ArrayList;
 import java.util.List;
 

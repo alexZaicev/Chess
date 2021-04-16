@@ -45,11 +45,21 @@ public class Move implements Serializable {
 
     Move move = (Move) o;
 
-    return new EqualsBuilder().append(getPieceColor(), move.getPieceColor()).append(getOldPosition(), move.getOldPosition()).append(getNewPosition(), move.getNewPosition()).append(getPiece(), move.getPiece()).isEquals();
+    return new EqualsBuilder()
+        .append(getPieceColor(), move.getPieceColor())
+        .append(getOldPosition(), move.getOldPosition())
+        .append(getNewPosition(), move.getNewPosition())
+        .append(getPiece(), move.getPiece())
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(getPieceColor()).append(getOldPosition()).append(getNewPosition()).append(getPiece()).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .append(getPieceColor())
+        .append(getOldPosition())
+        .append(getNewPosition())
+        .append(getPiece())
+        .toHashCode();
   }
 }

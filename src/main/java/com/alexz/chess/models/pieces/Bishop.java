@@ -37,7 +37,5 @@ public class Bishop extends PieceBase {
   }
 
   @Override
-  public void postMoveUpdate() {
-
-  }
+  public void postMoveUpdate() {}
 }

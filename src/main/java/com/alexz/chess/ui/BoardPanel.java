@@ -11,11 +11,16 @@ import com.alexz.chess.services.CfgProvider;
 import com.alexz.chess.ui.widgets.Button;
 import com.alexz.chess.ui.widgets.Label;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.text.CaseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class BoardPanel extends JPanel implements IBoardListener {
 
@@ -68,71 +73,133 @@ public class BoardPanel extends JPanel implements IBoardListener {
 
   private void composeInMenu() {
     Label lbl =
-        new Label(CfgProvider.getInstance().getStr(ConfigKey.TITLE), 0, 0, SwingConstants.CENTER);
-    lbl.setFont(ConfigKey.FONT_H2);
-    lbl.setSize(200, lbl.getFont().getSize());
+        new Label(
+            CfgProvider.getInstance().getStr(ConfigKey.TITLE),
+            0,
+            0,
+            SwingConstants.CENTER,
+            ConfigKey.FONT_H2);
     lbl.setLocation((this.getWidth() - lbl.getWidth()) / 2, 35);
     this.add(lbl);
   }
 
   private void composeInGame() {
-    Label lbl = new Label("Player A", 0, 0);
-    lbl.setFont(ConfigKey.FONT_H4);
+    String text =
+        "Player A ["
+            + CaseUtils.toCamelCase(this.board.getPlayerA().getPieceColor().toString(), true)
+            + "]";
+    Label lbl = new Label(text, 0, 0, ConfigKey.FONT_H6);
     this.add(lbl);
 
-    lbl = new Label("Player B", this.getWidth() - lbl.getWidth(), 0, SwingConstants.RIGHT);
-    lbl.setFont(ConfigKey.FONT_H4);
+    text =
+        "Player B ["
+            + CaseUtils.toCamelCase(this.board.getPlayerB().getPieceColor().toString(), true)
+            + "]";
+    lbl = new Label(text, 0, 0, SwingConstants.RIGHT, ConfigKey.FONT_H6);
+    lbl.setLocation(this.getWidth() - lbl.getWidth(), 0);
     this.add(lbl);
 
     final String txt =
         this.board.isPlayersTurn(this.board.getPlayerA().getPieceColor())
             ? "Player A turn"
             : "Player B turn";
-    lbl = new Label(txt, (this.getWidth() - lbl.getWidth()) / 2, 35, SwingConstants.CENTER);
-    lbl.setFont(ConfigKey.FONT_H5);
+    lbl =
+        new Label(
+            txt,
+            (this.getWidth() - lbl.getWidth()) / 2,
+            35,
+            SwingConstants.CENTER,
+            ConfigKey.FONT_H5);
     this.add(lbl);
 
-    final JPanel grid = new JPanel(new GridLayout(8, 8));
-    final String[] cols = new String[] {"A", "B", "C", "D", "E", "F", "G", "H"};
-    for (int i = 1; i < 9; ++i) {
-      for (final String s : cols) {
-        final Tile tile = Tile.valueOf(String.format("%s%d", s, i));
-        final IPiece piece = this.board.getBoard().get(tile);
-        final Button btn = new Button(piece == null ? "" : piece.toString());
-        btn.setBackground(this.getBtnColor(tile));
+    final JPanel grid = new JPanel(new GridBagLayout());
+    final int width = this.getWidth() - 60;
+    final int height = this.getWidth() - 60;
+    grid.setBounds((this.getWidth() - width - 10) / 2, 95, width, height);
+    grid.setSize(new Dimension(width, height));
+    grid.setPreferredSize(new Dimension(width, height));
 
-        if (piece != null
-            || this.board.getAvailableMoves().contains(tile)
-            || this.board.getAvailableAttackMoves().contains(tile)) {
-          if (piece != null) {
-            btn.setForeground(
-                (Color)
-                    CfgProvider.getInstance()
-                        .get(
-                            piece.getPieceColor() == PieceColor.WHITE
-                                ? ConfigKey.COLOR_PIECE_WHITE
-                                : ConfigKey.COLOR_PIECE_BLACK));
-          }
-          btn.setEnabled(true);
-          btn.setOnClick(
-              obj -> {
-                _logger.debug("Tile pressed [" + tile + "]");
-                BoardService.getInstance().onPlayerAction(tile, piece);
-              });
+    final int btnWidth = 40;
+    final int btnHeight = 40;
 
+    final List<String> columns = this.getColNames();
+    for (int i = 0; i < 9; ++i) {
+      for (final String s : columns) {
+        if (i == 0) {
+          final Label btn = new Label(s, 0, 0, SwingConstants.CENTER, ConfigKey.FONT_P_BOLD);
+          btn.setSize(new Dimension(btnWidth, btnHeight - 30));
+          grid.add(btn, this.getGbc(columns.indexOf(s) + 1, 0));
         } else {
-          btn.setEnabled(false);
+          final Tile tile = Tile.valueOf(String.format("%s%d", s, i));
+          final IPiece piece = this.board.getBoard().get(tile);
+          final Button btn = this.getBoardBtn(tile, piece);
+          btn.setSize(new Dimension(btnWidth, btnHeight));
+          grid.add(btn, this.getGbc(columns.indexOf(s) + 1, i));
         }
-        grid.add(btn);
       }
     }
 
-    final int width = this.getWidth() - 100;
-    final int height = this.getHeight() - 100;
-    grid.setBounds((this.getWidth() - width) / 2, 85, width, height);
-    grid.setSize(new Dimension(width, height));
-    grid.setPreferredSize(new Dimension(width, height));
+    for (int i = 0; i < 9; ++i) {
+      if (i == 0) {
+        continue;
+      }
+      final Label btn =
+          new Label(Integer.toString(i), 0, 0, SwingConstants.CENTER, ConfigKey.FONT_P_BOLD);
+      btn.setSize(new Dimension(btnWidth - 30, btnHeight));
+      grid.add(btn, this.getGbc(0, i));
+    }
+
     this.add(grid);
+  }
+
+  private Button getBoardBtn(final Tile tile, final IPiece piece) {
+    final Button btn = new Button(piece == null ? "" : piece.toString());
+    btn.setBackground(this.getBtnColor(tile));
+
+    if (piece != null
+        || this.board.getAvailableMoves().contains(tile)
+        || this.board.getAvailableAttackMoves().contains(tile)) {
+      if (piece != null) {
+        btn.setForeground(
+            (Color)
+                CfgProvider.getInstance()
+                    .get(
+                        piece.getPieceColor() == PieceColor.WHITE
+                            ? ConfigKey.COLOR_PIECE_WHITE
+                            : ConfigKey.COLOR_PIECE_BLACK));
+      }
+      btn.setEnabled(true);
+      btn.setOnClick(
+          obj -> {
+            _logger.debug("Tile pressed [" + tile + "]");
+            BoardService.getInstance().onPlayerAction(tile, piece);
+          });
+
+    } else {
+      btn.setEnabled(false);
+    }
+    return btn;
+  }
+
+  private List<String> getColNames() {
+    final Set<String> columns = new HashSet<>();
+    for (final Tile tile : Tile.values()) {
+      columns.add(tile.name().substring(0, 1));
+    }
+    return new ArrayList<>(columns);
+  }
+
+  private GridBagConstraints getGbc(final int gridX, final int gridY) {
+    final GridBagConstraints gbc = new GridBagConstraints();
+    gbc.anchor = GridBagConstraints.PAGE_START;
+    gbc.fill = GridBagConstraints.BOTH;
+    gbc.gridx = gridX;
+    gbc.gridy = gridY;
+    gbc.gridwidth = 1;
+    gbc.gridheight = 1;
+    gbc.weightx = 1;
+    gbc.weighty = 1;
+    return gbc;
   }
 
   private void composeGameOver() {

@@ -13,13 +13,9 @@ public abstract class PieceBase implements IPiece {
   protected final String id;
   protected PieceColor pieceColor;
 
-  public PieceBase(PieceColor pieceColor) {
+  public PieceBase(final PieceColor pieceColor) {
     this.id = UUID.randomUUID().toString();
     this.pieceColor = pieceColor;
-  }
-
-  public String getId() {
-    return id;
   }
 
   @Override
@@ -27,7 +23,7 @@ public abstract class PieceBase implements IPiece {
     return this.pieceColor;
   }
 
-  public void setPieceColor(PieceColor pieceColor) {
+  public void setPieceColor(final PieceColor pieceColor) {
     this.pieceColor = pieceColor;
   }
 
@@ -42,32 +38,49 @@ public abstract class PieceBase implements IPiece {
     return currentPos;
   }
 
-  protected void addAttackMove(
-          final String column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
+  protected boolean addAttackMove(
+      final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
+    if (this.isColRowOutOfBounds(column, row)) {
+      return false;
+    }
     final Tile move = Tile.valueOf(String.format("%s%d", column, row));
     final IPiece piece = board.get(move);
     if (piece != null && piece.getPieceColor() != this.getPieceColor()) {
       moves.add(move);
+      return true;
     }
+    return false;
   }
 
-  protected void addMove(
-      final String column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
+  protected boolean addMove(
+      final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
+    if (this.isColRowOutOfBounds(column, row)) {
+      return false;
+    }
     final Tile move = Tile.valueOf(String.format("%s%d", column, row));
     if (board.get(move) == null) {
       moves.add(move);
+      return true;
     }
+    return false;
+  }
+
+  protected boolean isColRowOutOfBounds(final char col, final int row) {
+    return col < 'A' || col > 'H' || row < 1 || row > 8;
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o) return true;
 
     if (!(o instanceof PieceBase)) return false;
 
-    PieceBase pieceBase = (PieceBase) o;
+    final PieceBase pieceBase = (PieceBase) o;
 
-    return new EqualsBuilder().append(getPieceColor(), pieceBase.getPieceColor()).append(id, pieceBase.id).isEquals();
+    return new EqualsBuilder()
+        .append(getPieceColor(), pieceBase.getPieceColor())
+        .append(id, pieceBase.id)
+        .isEquals();
   }
 
   @Override
