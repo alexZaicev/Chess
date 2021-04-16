@@ -1,6 +1,8 @@
 package com.alexz.chess.models.pieces;
 
 import com.alexz.chess.models.board.Tile;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,50 +29,7 @@ public class Bishop extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      final char column = currentPos.name().charAt(0);
-      final int row = Integer.parseInt(currentPos.name().substring(1));
-
-      if (row != 1) {
-        if (column != 'A') {
-          char tmp = column;
-          for (int i = row - 1; i > 0; --i) {
-            tmp -= 1;
-            if (!this.addAttackMove(tmp, i, board, moves)) {
-              break;
-            }
-          }
-        }
-        if (column != 'H') {
-          char tmp = column;
-          for (int i = row - 1; i > 0; --i) {
-            tmp += 1;
-            if (!this.addAttackMove(tmp, i, board, moves)) {
-              break;
-            }
-          }
-        }
-      }
-
-      if (row != 8) {
-        if (column != 'A') {
-          char tmp = column;
-          for (int i = row + 1; i < 9; ++i) {
-            tmp -= 1;
-            if (!this.addAttackMove(tmp, i, board, moves)) {
-              break;
-            }
-          }
-        }
-        if (column != 'H') {
-          char tmp = column;
-          for (int i = row + 1; i < 9; ++i) {
-            tmp += 1;
-            if (!this.addAttackMove(tmp, i, board, moves)) {
-              break;
-            }
-          }
-        }
-      }
+      moves.addAll(PieceUtils.getBishopAttackMoves(board, currentPos, this.pieceColor));
     }
     return moves;
   }
@@ -86,54 +45,25 @@ public class Bishop extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      final char column = currentPos.name().charAt(0);
-      final int row = Integer.parseInt(currentPos.name().substring(1));
-
-      if (row != 1) {
-        if (column != 'A') {
-          char tmp = column;
-          for (int i = row - 1; i > 0; --i) {
-            tmp -= 1;
-            if (!this.addMove(tmp, i, board, moves)) {
-              break;
-            }
-          }
-        }
-        if (column != 'H') {
-          char tmp = column;
-          for (int i = row - 1; i > 0; --i) {
-            tmp += 1;
-            if (!this.addMove(tmp, i, board, moves)) {
-              break;
-            }
-          }
-        }
-      }
-
-      if (row != 8) {
-        if (column != 'A') {
-          char tmp = column;
-          for (int i = row + 1; i < 9; ++i) {
-            tmp -= 1;
-            if (!this.addMove(tmp, i, board, moves)) {
-              break;
-            }
-          }
-        }
-        if (column != 'H') {
-          char tmp = column;
-          for (int i = row + 1; i < 9; ++i) {
-            tmp += 1;
-            if (!this.addMove(tmp, i, board, moves)) {
-              break;
-            }
-          }
-        }
-      }
+      moves.addAll(PieceUtils.getBishopMoves(board, currentPos));
     }
     return moves;
   }
 
   @Override
   public void postMoveUpdate() {}
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) return true;
+
+    if (!(o instanceof Bishop)) return false;
+
+    return new EqualsBuilder().appendSuper(super.equals(o)).isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).toHashCode();
+  }
 }

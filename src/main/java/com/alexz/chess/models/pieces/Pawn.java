@@ -42,10 +42,10 @@ public class Pawn extends PieceBase {
       }
 
       if (column != 'H') {
-        this.addAttackMove((char) (column + 1), row, board, attackMoves);
+        PieceUtils.addAttackMove((char) (column + 1), row, board, attackMoves, this.pieceColor);
       }
       if (column != 'A') {
-        this.addAttackMove((char) (column - 1), row, board, attackMoves);
+        PieceUtils.addAttackMove((char) (column - 1), row, board, attackMoves, this.pieceColor);
       }
     }
     return attackMoves;
@@ -67,14 +67,14 @@ public class Pawn extends PieceBase {
 
       if (isBot) {
         if (this.isFirstMove()) {
-          this.addMove(column, row + 2, board, moves);
+          PieceUtils.addMove(column, row + 2, board, moves);
         }
-        this.addMove(column, row + 1, board, moves);
+        PieceUtils.addMove(column, row + 1, board, moves);
       } else {
         if (this.isFirstMove()) {
-          this.addMove(column, row - 2, board, moves);
+          PieceUtils.addMove(column, row - 2, board, moves);
         }
-        this.addMove(column, row - 1, board, moves);
+        PieceUtils.addMove(column, row - 1, board, moves);
       }
     }
     return moves;
@@ -91,33 +91,6 @@ public class Pawn extends PieceBase {
 
   public void setFirstMove(final boolean firstMove) {
     this.firstMove = firstMove;
-  }
-
-  protected boolean addAttackMove(
-      final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
-    if (this.isColRowOutOfBounds(column, row)) {
-      return false;
-    }
-    final Tile move = Tile.valueOf(String.format("%s%d", column, row));
-    final IPiece piece = board.get(move);
-    if (piece != null && piece.getPieceColor() != this.getPieceColor()) {
-      moves.add(move);
-      return true;
-    }
-    return false;
-  }
-
-  protected boolean addMove(
-      final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
-    if (this.isColRowOutOfBounds(column, row)) {
-      return false;
-    }
-    final Tile move = Tile.valueOf(String.format("%s%d", column, row));
-    if (board.get(move) == null) {
-      moves.add(move);
-      return true;
-    }
-    return false;
   }
 
   @Override

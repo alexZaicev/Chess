@@ -4,7 +4,6 @@ import com.alexz.chess.models.board.Tile;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,39 +35,6 @@ public abstract class PieceBase implements IPiece {
       }
     }
     return currentPos;
-  }
-
-  protected boolean addMove(
-      final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
-    if (this.isColRowOutOfBounds(column, row)) {
-      return false;
-    }
-    final Tile move = Tile.valueOf(String.format("%s%d", column, row));
-    if (board.get(move) != null) {
-      return false;
-    }
-    moves.add(move);
-    return true;
-  }
-
-  protected boolean addAttackMove(
-      final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
-    if (this.isColRowOutOfBounds(column, row)) {
-      return false;
-    }
-    final Tile move = Tile.valueOf(String.format("%s%d", column, row));
-    final IPiece piece = board.get(move);
-    if (piece == null) {
-      return true;
-    }
-    if (piece.getPieceColor() != this.getPieceColor()) {
-      moves.add(move);
-    }
-    return false;
-  }
-
-  protected boolean isColRowOutOfBounds(final char col, final int row) {
-    return col < 'A' || col > 'H' || row < 1 || row > 8;
   }
 
   @Override

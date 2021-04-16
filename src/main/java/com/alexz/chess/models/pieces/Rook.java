@@ -40,11 +40,7 @@ public class Rook extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      final char column = currentPos.name().charAt(0);
-      final int row = Integer.parseInt(currentPos.name().substring(1));
-
-      attackMoves.addAll(this.getVerticalAttackMoves(board, column, row));
-      attackMoves.addAll(this.getHorizontalAttackMoves(board, column, row));
+      attackMoves.addAll(PieceUtils.getRookAttackMoves(board, currentPos, this.pieceColor));
     }
     return attackMoves;
   }
@@ -60,11 +56,7 @@ public class Rook extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      final char column = currentPos.name().charAt(0);
-      final int row = Integer.parseInt(currentPos.name().substring(1));
-
-      moves.addAll(this.getVerticalMoves(board, column, row));
-      moves.addAll(this.getHorizontalMoves(board, column, row));
+      moves.addAll(PieceUtils.getRookMoves(board, currentPos));
     }
 
     return moves;
@@ -95,85 +87,5 @@ public class Rook extends PieceBase {
         .appendSuper(super.hashCode())
         .append(isFirstMove())
         .toHashCode();
-  }
-
-  private List<Tile> getVerticalAttackMoves(
-      final Map<Tile, IPiece> board, final char column, final int row) {
-    final List<Tile> moves = new ArrayList<>();
-    if (row != 8) {
-      for (int i = row + 1; i < 9; ++i) {
-        if (!this.addAttackMove(column, i, board, moves)) {
-          break;
-        }
-      }
-    }
-    if (row != 1) {
-      for (int i = row - 1; i > 0; --i) {
-        if (!this.addAttackMove(column, i, board, moves)) {
-          break;
-        }
-      }
-    }
-    return moves;
-  }
-
-  private List<Tile> getHorizontalAttackMoves(
-      final Map<Tile, IPiece> board, final char column, final int row) {
-    final List<Tile> moves = new ArrayList<>();
-    if (column != 'H') {
-      for (int i = column + 1; i <= 'H'; ++i) {
-        if (!this.addAttackMove((char) i, row, board, moves)) {
-          break;
-        }
-      }
-    }
-    if (column != 'A') {
-      for (int i = column - 1; i >= 'A'; --i) {
-        if (!this.addAttackMove((char) i, row, board, moves)) {
-          break;
-        }
-      }
-    }
-    return moves;
-  }
-
-  private List<Tile> getVerticalMoves(
-      final Map<Tile, IPiece> board, final char column, final int row) {
-    final List<Tile> moves = new ArrayList<>();
-    if (row != 8) {
-      for (int i = row + 1; i < 9; ++i) {
-        if (!this.addMove(column, i, board, moves)) {
-          break;
-        }
-      }
-    }
-    if (row != 1) {
-      for (int i = row - 1; i > 0; --i) {
-        if (!this.addMove(column, i, board, moves)) {
-          break;
-        }
-      }
-    }
-    return moves;
-  }
-
-  private List<Tile> getHorizontalMoves(
-      final Map<Tile, IPiece> board, final char column, final int row) {
-    final List<Tile> moves = new ArrayList<>();
-    if (column != 'H') {
-      for (int i = column + 1; i <= 'H'; ++i) {
-        if (!this.addMove((char) i, row, board, moves)) {
-          break;
-        }
-      }
-    }
-    if (column != 'A') {
-      for (int i = column - 1; i >= 'A'; --i) {
-        if (!this.addMove((char) i, row, board, moves)) {
-          break;
-        }
-      }
-    }
-    return moves;
   }
 }

@@ -1,14 +1,20 @@
 package com.alexz.chess.models.pieces;
 
 import com.alexz.chess.models.board.Tile;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class King extends PieceBase {
-  public King(PieceColor color) {
+
+  private boolean firstMove;
+
+  public King(final PieceColor color) {
     super(color);
+    this.firstMove = true;
   }
 
   @Override
@@ -17,25 +23,89 @@ public class King extends PieceBase {
   }
 
   @Override
-  public List<Tile> getAttackMoves(Map<Tile, IPiece> board) {
-    return new ArrayList<>();
+  public List<Tile> getAttackMoves(final Map<Tile, IPiece> board) {
+    return this.getAttackMoves(board, false);
   }
 
   @Override
-  public List<Tile> getAttackMoves(Map<Tile, IPiece> board, final boolean isBot) {
-    return new ArrayList<>();
+  public List<Tile> getAttackMoves(final Map<Tile, IPiece> board, final boolean isBot) {
+    final List<Tile> moves = new ArrayList<>();
+    final Tile currentPos = this.getCurrentPosition(board);
+
+    if (currentPos != null) {
+      final char column = currentPos.name().charAt(0);
+      final int row = Integer.parseInt(currentPos.name().substring(1));
+
+      PieceUtils.addAttackMove(column, row + 1, board, moves, this.pieceColor);
+      PieceUtils.addAttackMove(column, row - 1, board, moves, this.pieceColor);
+      PieceUtils.addAttackMove((char) (column + 1), row, board, moves, this.pieceColor);
+      PieceUtils.addAttackMove((char) (column - 1), row, board, moves, this.pieceColor);
+      PieceUtils.addAttackMove((char) (column + 1), row + 1, board, moves, this.pieceColor);
+      PieceUtils.addAttackMove((char) (column + 1), row - 1, board, moves, this.pieceColor);
+      PieceUtils.addAttackMove((char) (column - 1), row + 1, board, moves, this.pieceColor);
+      PieceUtils.addAttackMove((char) (column - 1), row - 1, board, moves, this.pieceColor);
+    }
+    return moves;
   }
 
   @Override
-  public List<Tile> getAvailableMoves(Map<Tile, IPiece> board) {
-    return new ArrayList<>();
+  public List<Tile> getAvailableMoves(final Map<Tile, IPiece> board) {
+    return this.getAvailableMoves(board, false);
   }
 
   @Override
-  public List<Tile> getAvailableMoves(Map<Tile, IPiece> board, boolean isBot) {
-    return new ArrayList<>();
+  public List<Tile> getAvailableMoves(final Map<Tile, IPiece> board, final boolean isBot) {
+    final List<Tile> moves = new ArrayList<>();
+    final Tile currentPos = this.getCurrentPosition(board);
+
+    if (currentPos != null) {
+      final char column = currentPos.name().charAt(0);
+      final int row = Integer.parseInt(currentPos.name().substring(1));
+
+      PieceUtils.addMove(column, row + 1, board, moves);
+      PieceUtils.addMove(column, row - 1, board, moves);
+      PieceUtils.addMove((char) (column + 1), row, board, moves);
+      PieceUtils.addMove((char) (column - 1), row, board, moves);
+      PieceUtils.addMove((char) (column + 1), row + 1, board, moves);
+      PieceUtils.addMove((char) (column + 1), row - 1, board, moves);
+      PieceUtils.addMove((char) (column - 1), row + 1, board, moves);
+      PieceUtils.addMove((char) (column - 1), row - 1, board, moves);
+    }
+    return moves;
   }
 
   @Override
-  public void postMoveUpdate() {}
+  public void postMoveUpdate() {
+    this.setFirstMove(false);
+  }
+
+  public boolean isFirstMove() {
+    return firstMove;
+  }
+
+  public void setFirstMove(final boolean firstMove) {
+    this.firstMove = firstMove;
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) return true;
+
+    if (!(o instanceof King)) return false;
+
+    final King king = (King) o;
+
+    return new EqualsBuilder()
+        .appendSuper(super.equals(o))
+        .append(isFirstMove(), king.isFirstMove())
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .appendSuper(super.hashCode())
+        .append(isFirstMove())
+        .toHashCode();
+  }
 }
