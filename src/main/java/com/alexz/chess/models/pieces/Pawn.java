@@ -33,20 +33,7 @@ public class Pawn extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      final char column = currentPos.name().charAt(0);
-      final int row;
-      if (isBot) {
-        row = Integer.parseInt(currentPos.name().substring(1)) + 1;
-      } else {
-        row = Integer.parseInt(currentPos.name().substring(1)) - 1;
-      }
-
-      if (column != 'H') {
-        PieceUtils.addAttackMove((char) (column + 1), row, board, attackMoves, this.pieceColor);
-      }
-      if (column != 'A') {
-        PieceUtils.addAttackMove((char) (column - 1), row, board, attackMoves, this.pieceColor);
-      }
+      attackMoves.addAll(PieceUtils.getPawnAttackMoves(board, currentPos, isBot, this.pieceColor));
     }
     return attackMoves;
   }
@@ -62,20 +49,7 @@ public class Pawn extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      final char column = currentPos.name().charAt(0);
-      final int row = Integer.parseInt(currentPos.name().substring(1));
-
-      if (isBot) {
-        if (this.isFirstMove()) {
-          PieceUtils.addMove(column, row + 2, board, moves);
-        }
-        PieceUtils.addMove(column, row + 1, board, moves);
-      } else {
-        if (this.isFirstMove()) {
-          PieceUtils.addMove(column, row - 2, board, moves);
-        }
-        PieceUtils.addMove(column, row - 1, board, moves);
-      }
+      moves.addAll(PieceUtils.getPawnMoves(board, currentPos, isBot, this.firstMove));
     }
     return moves;
   }

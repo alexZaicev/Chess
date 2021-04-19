@@ -32,6 +32,97 @@ public class PieceUtils {
     return getDiagonalAttackMoves(board, pos, pieceColor);
   }
 
+  public static List<Tile> getKnightMoves(final Map<Tile, IPiece> board, final Tile pos) {
+    final List<Tile> moves = new ArrayList<>();
+
+    final char column = pos.name().charAt(0);
+    final int row = Integer.parseInt(pos.name().substring(1));
+
+    // vertical moves
+    addMove((char) (column - 1), row + 2, board, moves);
+    addMove((char) (column + 1), row + 2, board, moves);
+    addMove((char) (column - 1), row - 2, board, moves);
+    addMove((char) (column + 1), row - 2, board, moves);
+
+    // horizontal moves
+    addMove((char) (column - 2), row + 1, board, moves);
+    addMove((char) (column + 2), row + 1, board, moves);
+    addMove((char) (column - 2), row - 1, board, moves);
+    addMove((char) (column + 2), row - 1, board, moves);
+
+    return moves;
+  }
+
+  public static List<Tile> getKnightAttackMoves(
+      final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
+    final List<Tile> moves = new ArrayList<>();
+
+    final char column = pos.name().charAt(0);
+    final int row = Integer.parseInt(pos.name().substring(1));
+
+    // vertical moves
+    addAttackMove((char) (column - 1), row + 2, board, moves, pieceColor);
+    addAttackMove((char) (column + 1), row + 2, board, moves, pieceColor);
+    addAttackMove((char) (column - 1), row - 2, board, moves, pieceColor);
+    addAttackMove((char) (column + 1), row - 2, board, moves, pieceColor);
+
+    // horizontal moves
+    addAttackMove((char) (column - 2), row + 1, board, moves, pieceColor);
+    addAttackMove((char) (column + 2), row + 1, board, moves, pieceColor);
+    addAttackMove((char) (column - 2), row - 1, board, moves, pieceColor);
+    addAttackMove((char) (column + 2), row - 1, board, moves, pieceColor);
+
+    return moves;
+  }
+
+  public static List<Tile> getPawnAttackMoves(
+      final Map<Tile, IPiece> board,
+      final Tile pos,
+      final boolean isBot,
+      final PieceColor pieceColor) {
+    final List<Tile> moves = new ArrayList<>();
+
+    final char column = pos.name().charAt(0);
+    final int row;
+    if (isBot) {
+      row = Integer.parseInt(pos.name().substring(1)) + 1;
+    } else {
+      row = Integer.parseInt(pos.name().substring(1)) - 1;
+    }
+
+    if (column != 'H') {
+      addAttackMove((char) (column + 1), row, board, moves, pieceColor);
+    }
+    if (column != 'A') {
+      addAttackMove((char) (column - 1), row, board, moves, pieceColor);
+    }
+    return moves;
+  }
+
+  public static List<Tile> getPawnMoves(
+      final Map<Tile, IPiece> board,
+      final Tile pos,
+      final boolean isBot,
+      final boolean isFirstMove) {
+    final List<Tile> moves = new ArrayList<>();
+
+    final char column = pos.name().charAt(0);
+    final int row = Integer.parseInt(pos.name().substring(1));
+
+    if (isBot) {
+      if (isFirstMove) {
+        PieceUtils.addMove(column, row + 2, board, moves);
+      }
+      PieceUtils.addMove(column, row + 1, board, moves);
+    } else {
+      if (isFirstMove) {
+        PieceUtils.addMove(column, row - 2, board, moves);
+      }
+      PieceUtils.addMove(column, row - 1, board, moves);
+    }
+    return moves;
+  }
+
   private static List<Tile> getDiagonalMoves(final Map<Tile, IPiece> board, final Tile pos) {
     final char column = pos.name().charAt(0);
     final int row = Integer.parseInt(pos.name().substring(1));

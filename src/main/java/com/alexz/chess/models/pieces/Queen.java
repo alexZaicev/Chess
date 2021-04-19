@@ -59,7 +59,7 @@ public class Queen extends PieceBase {
   public boolean equals(final Object o) {
     if (this == o) return true;
 
-    if (!(o instanceof King)) return false;
+    if (!(o instanceof Queen)) return false;
 
     return new EqualsBuilder().appendSuper(super.equals(o)).isEquals();
   }
