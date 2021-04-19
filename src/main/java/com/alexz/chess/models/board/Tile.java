@@ -1,5 +1,7 @@
 package com.alexz.chess.models.board;
 
+import com.alexz.chess.models.pieces.PieceColor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,17 +107,33 @@ public enum Tile {
     return positions;
   }
 
-  public static List<Tile> getInitialQueenPositions(final boolean isBot) {
+  public static List<Tile> getInitialQueenPositions(final boolean isBot, final PieceColor pieceColor) {
     final List<Tile> positions = new ArrayList<>();
-    final String s = isBot ? "1" : "8";
-    positions.add(Tile.valueOf(String.format("%s%s", "D", s)));
+    final String row;
+    final String column;
+    if (isBot) {
+      row = "1";
+      column = pieceColor == PieceColor.BLACK ? "E" : "D";
+    } else {
+      row = "8";
+      column = pieceColor == PieceColor.BLACK ? "D" : "E";
+    }
+    positions.add(Tile.valueOf(String.format("%s%s", column, row)));
     return positions;
   }
 
-  public static List<Tile> getInitialKingPositions(final boolean isBot) {
+  public static List<Tile> getInitialKingPositions(final boolean isBot, final PieceColor pieceColor) {
     final List<Tile> positions = new ArrayList<>();
-    final String s = isBot ? "1" : "8";
-    positions.add(Tile.valueOf(String.format("%s%s", "E", s)));
+    final String row;
+    final String column;
+    if (isBot) {
+      row = "1";
+      column = pieceColor == PieceColor.BLACK ? "D" : "E";
+    } else {
+      row = "8";
+      column = pieceColor == PieceColor.BLACK ? "E" : "D";
+    }
+    positions.add(Tile.valueOf(String.format("%s%s", column, row)));
     return positions;
   }
 }

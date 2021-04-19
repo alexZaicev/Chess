@@ -61,6 +61,6 @@ public class BotWorker extends SwingWorker<Void, Void> {
       _logger.error("Failed to generate next move");
       return;
     }
-    BoardService.getInstance().onMoveAction(this.nextMove);
+    BoardService.getInstance().onMoveAction(this.nextMove, true);
   }
 }

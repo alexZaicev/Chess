@@ -1,6 +1,7 @@
 package com.alexz.chess.models.pieces;
 
 import com.alexz.chess.models.board.Tile;
+import com.alexz.chess.services.PieceUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 

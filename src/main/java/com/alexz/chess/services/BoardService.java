@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class BoardService extends ServiceBase {
 
@@ -64,7 +65,7 @@ public class BoardService extends ServiceBase {
     return difficulty;
   }
 
-  public void setDifficulty(Difficulty difficulty) {
+  public void setDifficulty(final Difficulty difficulty) {
     this.difficulty = difficulty;
   }
 
@@ -101,6 +102,19 @@ public class BoardService extends ServiceBase {
   }
 
   public void onMoveAction(final Move move) {
+    this.onMoveAction(move, false);
+  }
+
+  public void onMoveAction(final Move move, final boolean isBot) {
+    if (!isBot && !this.board.getAvailableMoves().contains(move.getNewPosition())
+        && !this.board.getAvailableAttackMoves().contains(move.getNewPosition())) {
+      this.selectedPiece = null;
+      this.board.getAvailableMoves().clear();
+      this.board.getAvailableAttackMoves().clear();
+      this.notifyListeners();
+      return;
+    }
+
     this.board.getBoard().put(move.getOldPosition(), null);
     this.board.getBoard().put(move.getNewPosition(), move.getPiece());
     move.getPiece().postMoveUpdate();
@@ -122,6 +136,16 @@ public class BoardService extends ServiceBase {
     } else {
       this.board.setTurnHolder(PieceColor.WHITE);
     }
+
+    this.board.setCheck(this.getCheckedPieceColor(this.board.getBoard()));
+    final PieceColor winPieceColor =
+        this.getWinPieceColor(this.board.getBoard(), this.board.getCheck());
+    if (winPieceColor == this.board.getPlayerA().getPieceColor()) {
+      this.board.setState(BoardState.PLAYER_A_WINS);
+    } else if (winPieceColor == this.board.getPlayerB().getPieceColor()) {
+      this.board.setState(BoardState.PLAYER_B_WINS);
+    }
+
     this.notifyListeners();
   }
 
@@ -164,11 +188,60 @@ public class BoardService extends ServiceBase {
     for (final Tile tile : Tile.getInitialBishopPositions(isBot)) {
       board.put(tile, new Bishop(color));
     }
-    for (final Tile tile : Tile.getInitialQueenPositions(isBot)) {
+    for (final Tile tile : Tile.getInitialQueenPositions(isBot, color)) {
       board.put(tile, new Queen(color));
     }
-    for (final Tile tile : Tile.getInitialKingPositions(isBot)) {
+    for (final Tile tile : Tile.getInitialKingPositions(isBot, color)) {
       board.put(tile, new King(color));
     }
+  }
+
+  public PieceColor getCheckedPieceColor(final Map<Tile, IPiece> board) {
+    final List<Tile> attackMoves = new ArrayList<>();
+    for (final IPiece piece : board.values()) {
+      if (piece != null) {
+        attackMoves.addAll(piece.getAttackMoves(this.board.getBoard()));
+      }
+    }
+    for (final Tile pos : attackMoves) {
+      final IPiece piece = board.get(pos);
+      if (piece instanceof King) {
+        return piece.getPieceColor();
+      }
+    }
+    return PieceColor.NONE;
+  }
+
+  public PieceColor getWinPieceColor(final Map<Tile, IPiece> board, final PieceColor checked) {
+    final List<King> kings = new ArrayList<>();
+    for (final IPiece piece : this.board.getBoard().values()) {
+      if (piece instanceof King) {
+        kings.add((King) piece);
+      }
+    }
+    if (kings.size() == 1) {
+      return kings.get(0).getPieceColor();
+    }
+
+    for (final King king : kings) {
+      final List<Tile> moves = king.getAvailableMoves(board);
+      for (final Tile move : moves) {
+        final Map<Tile, IPiece> newBoard = new TreeMap<>(board);
+        newBoard.put(move, king);
+        final PieceColor pieceColor = this.getCheckedPieceColor(newBoard);
+        if (pieceColor == PieceColor.NONE) {
+          continue;
+        }
+        if (checked == pieceColor) {
+          return checked == PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE;
+        }
+      }
+    }
+    return PieceColor.NONE;
+  }
+
+  public boolean isDraw(final Map<Tile, IPiece> board) {
+    // TODO
+    return false;
   }
 }

@@ -22,13 +22,23 @@ public class Board extends EntityBase {
   private PieceColor turnHolder;
   private IPlayer playerA;
   private IPlayer playerB;
+  private PieceColor check;
 
   public Board() {
     this.state = BoardState.IN_MENU;
     this.turnHolder = PieceColor.WHITE;
+    this.check = PieceColor.NONE;
     this.board = new TreeMap<>();
     this.availableMoves = new HashSet<>();
     this.availableAttackMoves = new HashSet<>();
+  }
+
+  public PieceColor getCheck() {
+    return check;
+  }
+
+  public void setCheck(final PieceColor check) {
+    this.check = check;
   }
 
   public Set<Tile> getAvailableAttackMoves() {
@@ -43,7 +53,7 @@ public class Board extends EntityBase {
     return playerA;
   }
 
-  public void setPlayerA(IPlayer playerA) {
+  public void setPlayerA(final IPlayer playerA) {
     this.playerA = playerA;
   }
 
@@ -51,7 +61,7 @@ public class Board extends EntityBase {
     return playerB;
   }
 
-  public void setPlayerB(IPlayer playerB) {
+  public void setPlayerB(final IPlayer playerB) {
     this.playerB = playerB;
   }
 
@@ -59,7 +69,7 @@ public class Board extends EntityBase {
     return board;
   }
 
-  public void setTurnHolder(PieceColor turnHolder) {
+  public void setTurnHolder(final PieceColor turnHolder) {
     this.turnHolder = turnHolder;
   }
 
@@ -71,17 +81,17 @@ public class Board extends EntityBase {
     return state;
   }
 
-  public void setState(BoardState state) {
+  public void setState(final BoardState state) {
     this.state = state;
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o) return true;
 
     if (!(o instanceof Board)) return false;
 
-    Board board1 = (Board) o;
+    final Board board1 = (Board) o;
 
     return new EqualsBuilder()
         .append(getBoard(), board1.getBoard())

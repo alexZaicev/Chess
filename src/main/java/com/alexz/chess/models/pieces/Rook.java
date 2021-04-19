@@ -1,6 +1,7 @@
 package com.alexz.chess.models.pieces;
 
 import com.alexz.chess.models.board.Tile;
+import com.alexz.chess.services.PieceUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -62,7 +63,7 @@ public class Rook extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      moves.addAll(PieceUtils.getRookMoves(board, currentPos));
+      moves.addAll(PieceUtils.getRookMoves(board, currentPos, this.pieceColor));
     }
 
     return moves;

@@ -2,6 +2,7 @@ package com.alexz.chess.ui;
 
 import com.alexz.chess.models.ConfigKey;
 import com.alexz.chess.models.board.Board;
+import com.alexz.chess.models.board.BoardState;
 import com.alexz.chess.models.board.IBoardListener;
 import com.alexz.chess.models.board.Tile;
 import com.alexz.chess.models.pieces.IPiece;
@@ -9,6 +10,7 @@ import com.alexz.chess.models.pieces.PieceColor;
 import com.alexz.chess.services.BoardService;
 import com.alexz.chess.services.CfgProvider;
 import com.alexz.chess.ui.widgets.Button;
+import com.alexz.chess.ui.widgets.InfoDialog;
 import com.alexz.chess.ui.widgets.Label;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
@@ -102,18 +104,21 @@ public class BoardPanel extends JPanel implements IBoardListener {
     lbl.setLocation(this.getWidth() - lbl.getWidth(), 0);
     this.add(lbl);
 
-    final String txt =
+    String txt =
         this.board.isPlayersTurn(this.board.getPlayerA().getPieceColor())
             ? "Player A turn"
             : "Player B turn";
-    lbl =
-        new Label(
-            txt,
-            (this.getWidth() - lbl.getWidth()) / 2,
-            35,
-            SwingConstants.CENTER,
-            ConfigKey.FONT_H5);
+    lbl = new Label(txt, 0, 0, SwingConstants.CENTER, ConfigKey.FONT_H5);
+    lbl.setLocation((this.getWidth() - lbl.getWidth()) / 2, 35);
     this.add(lbl);
+
+    if (this.board.getCheck() != PieceColor.NONE) {
+      txt =
+          String.format("%s is checked", CaseUtils.toCamelCase(this.board.getCheck().name(), true));
+      lbl = new Label(txt, 0, 0, SwingConstants.CENTER, ConfigKey.FONT_H5);
+      lbl.setLocation((this.getWidth() - lbl.getWidth()) / 2, 65);
+      this.add(lbl);
+    }
 
     final JPanel grid = new JPanel(new GridBagLayout());
     final int width = this.getWidth() - 60;
@@ -156,15 +161,13 @@ public class BoardPanel extends JPanel implements IBoardListener {
   }
 
   private Button getBoardBtn(final Tile tile, final IPiece piece) {
-    Button btn;
+    final Button btn = new Button();
     if (piece != null) {
       try {
         final InputStream in =
             this.getClass().getClassLoader().getResourceAsStream(piece.getIconPath());
         final byte[] bytes = IOUtils.toByteArray(in);
         final ImageIcon im = new ImageIcon(bytes);
-        btn = new Button(im);
-
         final Dimension size = btn.getSize();
         if (size.width > size.height) {
           size.width = -1;
@@ -172,42 +175,32 @@ public class BoardPanel extends JPanel implements IBoardListener {
           size.height = -1;
         }
         final Image scaled =
-            ((ImageIcon) btn.getIcon())
-                .getImage()
-                .getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
+            im.getImage().getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
         btn.setIcon(new ImageIcon(scaled));
-
       } catch (final IOException ex) {
         _logger.error("Unable to load icon for piece under path [" + piece.getIconPath() + "]", ex);
-        btn = new Button(piece.toString());
       }
     } else {
-      btn = new Button("");
+      btn.setText("");
     }
     btn.setBackground(this.getBtnColor(tile));
+    btn.setEnabled(true);
+    btn.setOnClick(
+        obj -> {
+          final PieceColor playerA = this.board.getPlayerA().getPieceColor();
+          if (this.board.getState() == BoardState.IN_GAME) {
+            if ((piece == null && this.board.getAvailableMoves().contains(tile))
+                || (piece != null
+                    && (this.board.getAvailableAttackMoves().contains(tile)
+                        || piece.getPieceColor() == playerA))) {
+              if (this.board.isPlayersTurn(playerA)) {
+                _logger.debug("Tile pressed [" + tile + "]");
+                BoardService.getInstance().onPlayerAction(tile, piece);
+              }
+            }
+          }
+        });
 
-    if (piece != null
-        || this.board.getAvailableMoves().contains(tile)
-        || this.board.getAvailableAttackMoves().contains(tile)) {
-      if (piece != null) {
-        btn.setForeground(
-            (Color)
-                CfgProvider.getInstance()
-                    .get(
-                        piece.getPieceColor() == PieceColor.WHITE
-                            ? ConfigKey.COLOR_PIECE_WHITE
-                            : ConfigKey.COLOR_PIECE_BLACK));
-      }
-      btn.setEnabled(true);
-      btn.setOnClick(
-          obj -> {
-            _logger.debug("Tile pressed [" + tile + "]");
-            BoardService.getInstance().onPlayerAction(tile, piece);
-          });
-
-    } else {
-      btn.setEnabled(false);
-    }
     return btn;
   }
 
@@ -233,7 +226,18 @@ public class BoardPanel extends JPanel implements IBoardListener {
   }
 
   private void composeGameOver() {
-    // TODO:
+    this.composeInGame();
+
+    final String txt;
+    if (this.board.getState() == BoardState.PLAYER_A_WINS) {
+      txt = "Player A have won this round!";
+    } else if (this.board.getState() == BoardState.PLAYER_B_WINS) {
+      txt = "Player B have won this round!";
+    } else {
+      txt = "It`s a Draw!";
+    }
+    new InfoDialog(null, "Game Finished", txt, r -> BoardService.getInstance().startNewGame())
+        .build();
   }
 
   private Color getBtnColor(final Tile tile) {

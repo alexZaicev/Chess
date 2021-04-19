@@ -1,6 +1,8 @@
-package com.alexz.chess.models.pieces;
+package com.alexz.chess.services;
 
 import com.alexz.chess.models.board.Tile;
+import com.alexz.chess.models.pieces.IPiece;
+import com.alexz.chess.models.pieces.PieceColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,8 @@ public class PieceUtils {
    * @param pos
    * @return
    */
-  public static List<Tile> getRookMoves(final Map<Tile, IPiece> board, final Tile pos) {
+  public static List<Tile> getRookMoves(
+      final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
     final List<Tile> moves = new ArrayList<>();
     moves.addAll(getVerticalMoves(board, pos));
     moves.addAll(getHorizontalMoves(board, pos));
@@ -39,7 +42,8 @@ public class PieceUtils {
    * @param pos
    * @return
    */
-  public static List<Tile> getBishopMoves(final Map<Tile, IPiece> board, final Tile pos) {
+  public static List<Tile> getBishopMoves(
+      final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
     return getDiagonalMoves(board, pos);
   }
 
@@ -54,12 +58,31 @@ public class PieceUtils {
     return getDiagonalAttackMoves(board, pos, pieceColor);
   }
 
+  public static List<Tile> getQueenAttackMoves(
+      final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
+    final List<Tile> moves = new ArrayList<>();
+    moves.addAll(getVerticalAttackMoves(board, pos, pieceColor));
+    moves.addAll(getHorizontalAttackMoves(board, pos, pieceColor));
+    moves.addAll(getDiagonalAttackMoves(board, pos, pieceColor));
+    return moves;
+  }
+
+  public static List<Tile> getQueenMoves(
+      final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
+    final List<Tile> moves = new ArrayList<>();
+    moves.addAll(getVerticalMoves(board, pos));
+    moves.addAll(getHorizontalMoves(board, pos));
+    moves.addAll(getDiagonalMoves(board, pos));
+    return moves;
+  }
+
   /**
    * @param board
    * @param pos
    * @return
    */
-  public static List<Tile> getKnightMoves(final Map<Tile, IPiece> board, final Tile pos) {
+  public static List<Tile> getKnightMoves(
+      final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
     final List<Tile> moves = new ArrayList<>();
 
     final char column = pos.name().charAt(0);
@@ -171,7 +194,6 @@ public class PieceUtils {
   }
 
   /**
-   *
    * @param board
    * @param pos
    * @param isFirstMove
@@ -197,17 +219,13 @@ public class PieceUtils {
   }
 
   /**
-   *
    * @param board
    * @param pos
-   * @param isBot
    * @param pieceColor
    * @return
    */
   public static List<Tile> getKingAttackMoves(
-      final Map<Tile, IPiece> board,
-      final Tile pos,
-      final PieceColor pieceColor) {
+      final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
     final List<Tile> moves = new ArrayList<>();
     final char column = pos.name().charAt(0);
     final int row = Integer.parseInt(pos.name().substring(1));
