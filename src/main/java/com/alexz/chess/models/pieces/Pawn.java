@@ -23,6 +23,12 @@ public class Pawn extends PieceBase {
   }
 
   @Override
+  public String getIconPath() {
+    final String root = super.getIconPath();
+    return String.format("%s/pawn_%s.png", root, this.pieceColor.name().toLowerCase());
+  }
+
+  @Override
   public List<Tile> getAttackMoves(final Map<Tile, IPiece> board) {
     return this.getAttackMoves(board, false);
   }

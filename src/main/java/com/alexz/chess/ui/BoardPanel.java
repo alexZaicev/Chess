@@ -10,6 +10,7 @@ import com.alexz.chess.services.BoardService;
 import com.alexz.chess.services.CfgProvider;
 import com.alexz.chess.ui.widgets.Button;
 import com.alexz.chess.ui.widgets.Label;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.text.CaseUtils;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +18,8 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +41,7 @@ public class BoardPanel extends JPanel implements IBoardListener {
   }
 
   @Override
-  public void notify(Board board) {
+  public void notify(final Board board) {
     if (board.equals(this.board)) {
       return;
     }
@@ -72,7 +75,7 @@ public class BoardPanel extends JPanel implements IBoardListener {
   }
 
   private void composeInMenu() {
-    Label lbl =
+    final Label lbl =
         new Label(
             CfgProvider.getInstance().getStr(ConfigKey.TITLE),
             0,
@@ -153,7 +156,34 @@ public class BoardPanel extends JPanel implements IBoardListener {
   }
 
   private Button getBoardBtn(final Tile tile, final IPiece piece) {
-    final Button btn = new Button(piece == null ? "" : piece.toString());
+    Button btn;
+    if (piece != null) {
+      try {
+        final InputStream in =
+            this.getClass().getClassLoader().getResourceAsStream(piece.getIconPath());
+        final byte[] bytes = IOUtils.toByteArray(in);
+        final ImageIcon im = new ImageIcon(bytes);
+        btn = new Button(im);
+
+        final Dimension size = btn.getSize();
+        if (size.width > size.height) {
+          size.width = -1;
+        } else {
+          size.height = -1;
+        }
+        final Image scaled =
+            ((ImageIcon) btn.getIcon())
+                .getImage()
+                .getScaledInstance(size.width, size.height, java.awt.Image.SCALE_SMOOTH);
+        btn.setIcon(new ImageIcon(scaled));
+
+      } catch (final IOException ex) {
+        _logger.error("Unable to load icon for piece under path [" + piece.getIconPath() + "]", ex);
+        btn = new Button(piece.toString());
+      }
+    } else {
+      btn = new Button("");
+    }
     btn.setBackground(this.getBtnColor(tile));
 
     if (piece != null

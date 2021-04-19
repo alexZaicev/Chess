@@ -18,6 +18,12 @@ public class King extends PieceBase {
   }
 
   @Override
+  public String getIconPath() {
+    final String root = super.getIconPath();
+    return String.format("%s/king_%s.png", root, this.pieceColor.name().toLowerCase());
+  }
+
+  @Override
   public String toString() {
     return "K";
   }
@@ -33,17 +39,7 @@ public class King extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      final char column = currentPos.name().charAt(0);
-      final int row = Integer.parseInt(currentPos.name().substring(1));
-
-      PieceUtils.addAttackMove(column, row + 1, board, moves, this.pieceColor);
-      PieceUtils.addAttackMove(column, row - 1, board, moves, this.pieceColor);
-      PieceUtils.addAttackMove((char) (column + 1), row, board, moves, this.pieceColor);
-      PieceUtils.addAttackMove((char) (column - 1), row, board, moves, this.pieceColor);
-      PieceUtils.addAttackMove((char) (column + 1), row + 1, board, moves, this.pieceColor);
-      PieceUtils.addAttackMove((char) (column + 1), row - 1, board, moves, this.pieceColor);
-      PieceUtils.addAttackMove((char) (column - 1), row + 1, board, moves, this.pieceColor);
-      PieceUtils.addAttackMove((char) (column - 1), row - 1, board, moves, this.pieceColor);
+      moves.addAll(PieceUtils.getKingAttackMoves(board, currentPos, this.pieceColor));
     }
     return moves;
   }
@@ -59,17 +55,7 @@ public class King extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      final char column = currentPos.name().charAt(0);
-      final int row = Integer.parseInt(currentPos.name().substring(1));
-
-      PieceUtils.addMove(column, row + 1, board, moves);
-      PieceUtils.addMove(column, row - 1, board, moves);
-      PieceUtils.addMove((char) (column + 1), row, board, moves);
-      PieceUtils.addMove((char) (column - 1), row, board, moves);
-      PieceUtils.addMove((char) (column + 1), row + 1, board, moves);
-      PieceUtils.addMove((char) (column + 1), row - 1, board, moves);
-      PieceUtils.addMove((char) (column - 1), row + 1, board, moves);
-      PieceUtils.addMove((char) (column - 1), row - 1, board, moves);
+      moves.addAll(PieceUtils.getKingMoves(board, currentPos, this.firstMove));
     }
     return moves;
   }

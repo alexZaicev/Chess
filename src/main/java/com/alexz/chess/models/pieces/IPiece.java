@@ -8,6 +8,8 @@ import java.util.Map;
 
 public interface IPiece extends Serializable {
 
+  String getIconPath();
+
   PieceColor getPieceColor();
 
   List<Tile> getAttackMoves(final Map<Tile, IPiece> board);

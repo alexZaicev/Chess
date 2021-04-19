@@ -8,6 +8,11 @@ import java.util.Map;
 
 public class PieceUtils {
 
+  /**
+   * @param board
+   * @param pos
+   * @return
+   */
   public static List<Tile> getRookMoves(final Map<Tile, IPiece> board, final Tile pos) {
     final List<Tile> moves = new ArrayList<>();
     moves.addAll(getVerticalMoves(board, pos));
@@ -15,6 +20,12 @@ public class PieceUtils {
     return moves;
   }
 
+  /**
+   * @param board
+   * @param pos
+   * @param pieceColor
+   * @return
+   */
   public static List<Tile> getRookAttackMoves(
       final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
     final List<Tile> moves = new ArrayList<>();
@@ -23,15 +34,31 @@ public class PieceUtils {
     return moves;
   }
 
+  /**
+   * @param board
+   * @param pos
+   * @return
+   */
   public static List<Tile> getBishopMoves(final Map<Tile, IPiece> board, final Tile pos) {
     return getDiagonalMoves(board, pos);
   }
 
+  /**
+   * @param board
+   * @param pos
+   * @param pieceColor
+   * @return
+   */
   public static List<Tile> getBishopAttackMoves(
       final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
     return getDiagonalAttackMoves(board, pos, pieceColor);
   }
 
+  /**
+   * @param board
+   * @param pos
+   * @return
+   */
   public static List<Tile> getKnightMoves(final Map<Tile, IPiece> board, final Tile pos) {
     final List<Tile> moves = new ArrayList<>();
 
@@ -53,6 +80,12 @@ public class PieceUtils {
     return moves;
   }
 
+  /**
+   * @param board
+   * @param pos
+   * @param pieceColor
+   * @return
+   */
   public static List<Tile> getKnightAttackMoves(
       final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
     final List<Tile> moves = new ArrayList<>();
@@ -75,6 +108,13 @@ public class PieceUtils {
     return moves;
   }
 
+  /**
+   * @param board
+   * @param pos
+   * @param isBot
+   * @param pieceColor
+   * @return
+   */
   public static List<Tile> getPawnAttackMoves(
       final Map<Tile, IPiece> board,
       final Tile pos,
@@ -99,6 +139,13 @@ public class PieceUtils {
     return moves;
   }
 
+  /**
+   * @param board
+   * @param pos
+   * @param isBot
+   * @param isFirstMove
+   * @return
+   */
   public static List<Tile> getPawnMoves(
       final Map<Tile, IPiece> board,
       final Tile pos,
@@ -120,6 +167,59 @@ public class PieceUtils {
       }
       PieceUtils.addMove(column, row - 1, board, moves);
     }
+    return moves;
+  }
+
+  /**
+   *
+   * @param board
+   * @param pos
+   * @param isFirstMove
+   * @return
+   */
+  public static List<Tile> getKingMoves(
+      final Map<Tile, IPiece> board, final Tile pos, final boolean isFirstMove) {
+    final List<Tile> moves = new ArrayList<>();
+    final char column = pos.name().charAt(0);
+    final int row = Integer.parseInt(pos.name().substring(1));
+
+    // TODO check for special combination with Rook
+
+    addMove(column, row + 1, board, moves);
+    addMove(column, row - 1, board, moves);
+    addMove((char) (column + 1), row, board, moves);
+    addMove((char) (column - 1), row, board, moves);
+    addMove((char) (column + 1), row + 1, board, moves);
+    addMove((char) (column + 1), row - 1, board, moves);
+    addMove((char) (column - 1), row + 1, board, moves);
+    addMove((char) (column - 1), row - 1, board, moves);
+    return moves;
+  }
+
+  /**
+   *
+   * @param board
+   * @param pos
+   * @param isBot
+   * @param pieceColor
+   * @return
+   */
+  public static List<Tile> getKingAttackMoves(
+      final Map<Tile, IPiece> board,
+      final Tile pos,
+      final PieceColor pieceColor) {
+    final List<Tile> moves = new ArrayList<>();
+    final char column = pos.name().charAt(0);
+    final int row = Integer.parseInt(pos.name().substring(1));
+
+    addAttackMove(column, row + 1, board, moves, pieceColor);
+    addAttackMove(column, row - 1, board, moves, pieceColor);
+    addAttackMove((char) (column + 1), row, board, moves, pieceColor);
+    addAttackMove((char) (column - 1), row, board, moves, pieceColor);
+    addAttackMove((char) (column + 1), row + 1, board, moves, pieceColor);
+    addAttackMove((char) (column + 1), row - 1, board, moves, pieceColor);
+    addAttackMove((char) (column - 1), row + 1, board, moves, pieceColor);
+    addAttackMove((char) (column - 1), row - 1, board, moves, pieceColor);
     return moves;
   }
 
@@ -312,7 +412,7 @@ public class PieceUtils {
     return moves;
   }
 
-  public static boolean addMove(
+  private static boolean addMove(
       final char column, final int row, final Map<Tile, IPiece> board, final List<Tile> moves) {
     if (isColRowOutOfBounds(column, row)) {
       return false;
@@ -325,7 +425,7 @@ public class PieceUtils {
     return true;
   }
 
-  public static boolean addAttackMove(
+  private static boolean addAttackMove(
       final char column,
       final int row,
       final Map<Tile, IPiece> board,

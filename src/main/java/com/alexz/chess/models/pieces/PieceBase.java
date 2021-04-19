@@ -18,6 +18,11 @@ public abstract class PieceBase implements IPiece {
   }
 
   @Override
+  public String getIconPath() {
+    return "img";
+  }
+
+  @Override
   public PieceColor getPieceColor() {
     return this.pieceColor;
   }

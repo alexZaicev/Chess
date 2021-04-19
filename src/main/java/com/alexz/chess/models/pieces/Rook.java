@@ -21,6 +21,12 @@ public class Rook extends PieceBase {
     return "R";
   }
 
+  @Override
+  public String getIconPath() {
+    final String root = super.getIconPath();
+    return String.format("%s/rook_%s.png", root, this.pieceColor.name().toLowerCase());
+  }
+
   public boolean isFirstMove() {
     return firstMove;
   }
