@@ -36,14 +36,15 @@ public class Bishop extends PieceBase {
   }
 
   @Override
-  public List<Tile> getAttackMoves(final Map<Tile, IPiece> board, final boolean isBot, final boolean filter) {
+  public List<Tile> getAttackMoves(
+      final Map<Tile, IPiece> board, final boolean isBot, final boolean filter) {
     final List<Tile> moves = new ArrayList<>();
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
       moves.addAll(PieceUtils.getBishopAttackMoves(board, currentPos, this.pieceColor));
       if (filter) {
-        PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
+        return PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
       }
     }
     return moves;
@@ -60,14 +61,15 @@ public class Bishop extends PieceBase {
   }
 
   @Override
-  public List<Tile> getAvailableMoves(final Map<Tile, IPiece> board, final boolean isBot, final boolean filter) {
+  public List<Tile> getAvailableMoves(
+      final Map<Tile, IPiece> board, final boolean isBot, final boolean filter) {
     final List<Tile> moves = new ArrayList<>();
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
       moves.addAll(PieceUtils.getBishopMoves(board, currentPos, this.pieceColor));
       if (filter) {
-        PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
+        return PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
       }
     }
     return moves;

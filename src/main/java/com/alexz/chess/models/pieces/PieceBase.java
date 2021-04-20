@@ -10,7 +10,7 @@ import java.util.UUID;
 public abstract class PieceBase implements IPiece {
 
   protected final String id;
-  protected PieceColor pieceColor;
+  protected final PieceColor pieceColor;
 
   public PieceBase(final PieceColor pieceColor) {
     this.id = UUID.randomUUID().toString();
@@ -27,16 +27,14 @@ public abstract class PieceBase implements IPiece {
     return this.pieceColor;
   }
 
-  public void setPieceColor(final PieceColor pieceColor) {
-    this.pieceColor = pieceColor;
-  }
-
   protected Tile getCurrentPosition(final Map<Tile, IPiece> board) {
     Tile currentPos = null;
-    for (final Map.Entry<Tile, IPiece> e : board.entrySet()) {
-      if (this.equals(e.getValue())) {
-        currentPos = e.getKey();
-        break;
+    if (board != null && !board.isEmpty()) {
+      for (final Map.Entry<Tile, IPiece> e : board.entrySet()) {
+        if (this.equals(e.getValue())) {
+          currentPos = e.getKey();
+          break;
+        }
       }
     }
     return currentPos;

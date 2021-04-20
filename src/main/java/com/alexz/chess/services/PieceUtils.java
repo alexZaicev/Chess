@@ -12,24 +12,22 @@ import java.util.TreeMap;
 
 public class PieceUtils {
 
-  public static void filterMovesToAvoidCheck(final Tile pos, final IPiece piece, final List<Tile> moves, final Map<Tile, IPiece> board) {
+  public static List<Tile> filterMovesToAvoidCheck(
+      final Tile pos, final IPiece piece, final List<Tile> moves, final Map<Tile, IPiece> board) {
     final List<Tile> filteredMoves = new ArrayList<>();
     final PieceColor checked = BoardService.getInstance().getCheckedPieceColor(board, false);
-//    if (checked == PieceColor.NONE) {
-//      return;
-//    }
-
     for (final Tile move : moves) {
       final Map<Tile, IPiece> newBoard = new TreeMap<>(board);
       newBoard.put(pos, null);
       newBoard.put(move, piece);
-      final PieceColor pieceColor = BoardService.getInstance().getCheckedPieceColor(newBoard, false);
-      if (pieceColor == PieceColor.NONE || (checked == PieceColor.NONE && pieceColor != piece.getPieceColor())) {
+      final PieceColor pieceColor =
+          BoardService.getInstance().getCheckedPieceColor(newBoard, false);
+      if (pieceColor == PieceColor.NONE
+          || (checked == PieceColor.NONE && pieceColor != piece.getPieceColor())) {
         filteredMoves.add(move);
       }
     }
-    moves.clear();
-    moves.addAll(filteredMoves);
+    return filteredMoves;
   }
 
   /**

@@ -2,4 +2,4 @@ package com.alexz.chess.models;
 
 import java.io.Serializable;
 
-public abstract class EntityBase implements Serializable {}
+public interface IEntity extends Serializable {}

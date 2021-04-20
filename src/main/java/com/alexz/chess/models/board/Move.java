@@ -1,20 +1,23 @@
 package com.alexz.chess.models.board;
 
+import com.alexz.chess.models.IEntity;
 import com.alexz.chess.models.pieces.IPiece;
 import com.alexz.chess.models.pieces.PieceColor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.io.Serializable;
-
-public class Move implements Serializable {
+public class Move implements IEntity {
 
   private final PieceColor pieceColor;
   private final Tile oldPosition;
   private final Tile newPosition;
   private final IPiece piece;
 
-  public Move(PieceColor pieceColor, Tile oldPosition, Tile newPosition, IPiece piece) {
+  public Move(
+      final PieceColor pieceColor,
+      final Tile oldPosition,
+      final Tile newPosition,
+      final IPiece piece) {
     this.pieceColor = pieceColor;
     this.oldPosition = oldPosition;
     this.newPosition = newPosition;
@@ -38,12 +41,12 @@ public class Move implements Serializable {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o) return true;
 
     if (!(o instanceof Move)) return false;
 
-    Move move = (Move) o;
+    final Move move = (Move) o;
 
     return new EqualsBuilder()
         .append(getPieceColor(), move.getPieceColor())

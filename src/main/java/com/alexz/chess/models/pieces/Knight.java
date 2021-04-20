@@ -44,7 +44,7 @@ public class Knight extends PieceBase {
     if (currentPos != null) {
       moves.addAll(PieceUtils.getKnightAttackMoves(board, currentPos, this.pieceColor));
       if (filter) {
-        PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
+        return PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
       }
     }
     return moves;
@@ -69,7 +69,7 @@ public class Knight extends PieceBase {
     if (currentPos != null) {
       moves.addAll(PieceUtils.getKnightMoves(board, currentPos, this.pieceColor));
       if (filter) {
-        PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
+        return PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
       }
     }
     return moves;

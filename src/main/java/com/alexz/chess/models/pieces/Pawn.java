@@ -40,14 +40,15 @@ public class Pawn extends PieceBase {
   }
 
   @Override
-  public List<Tile> getAttackMoves(final Map<Tile, IPiece> board, final boolean isBot, final boolean filter) {
+  public List<Tile> getAttackMoves(
+      final Map<Tile, IPiece> board, final boolean isBot, final boolean filter) {
     final List<Tile> moves = new ArrayList<>();
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
       moves.addAll(PieceUtils.getPawnAttackMoves(board, currentPos, isBot, this.pieceColor));
       if (filter) {
-        PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
+        return PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
       }
     }
     return moves;
@@ -64,14 +65,15 @@ public class Pawn extends PieceBase {
   }
 
   @Override
-  public List<Tile> getAvailableMoves(final Map<Tile, IPiece> board, final boolean isBot, final boolean filter) {
+  public List<Tile> getAvailableMoves(
+      final Map<Tile, IPiece> board, final boolean isBot, final boolean filter) {
     final List<Tile> moves = new ArrayList<>();
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
       moves.addAll(PieceUtils.getPawnMoves(board, currentPos, isBot, this.firstMove));
       if (filter) {
-        PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
+        return PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
       }
     }
     return moves;

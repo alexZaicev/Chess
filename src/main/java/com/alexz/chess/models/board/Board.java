@@ -1,6 +1,6 @@
 package com.alexz.chess.models.board;
 
-import com.alexz.chess.models.EntityBase;
+import com.alexz.chess.models.IEntity;
 import com.alexz.chess.models.pieces.IPiece;
 import com.alexz.chess.models.pieces.PieceColor;
 import com.alexz.chess.models.players.IPlayer;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class Board extends EntityBase {
+public class Board implements IEntity {
 
   private final Map<Tile, IPiece> board;
   private final Set<Tile> availableMoves;

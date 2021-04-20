@@ -6,7 +6,7 @@ public abstract class PlayerBase implements IPlayer {
 
   private final PieceColor color;
 
-  public PlayerBase(PieceColor color) {
+  public PlayerBase(final PieceColor color) {
     this.color = color;
   }
 

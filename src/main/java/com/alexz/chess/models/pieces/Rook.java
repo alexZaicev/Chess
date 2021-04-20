@@ -56,7 +56,7 @@ public class Rook extends PieceBase {
     if (currentPos != null) {
       moves.addAll(PieceUtils.getRookAttackMoves(board, currentPos, this.pieceColor));
       if (filter) {
-        PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
+        return PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
       }
     }
     return moves;
@@ -81,7 +81,7 @@ public class Rook extends PieceBase {
     if (currentPos != null) {
       moves.addAll(PieceUtils.getRookMoves(board, currentPos, this.pieceColor));
       if (filter) {
-        PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
+        return PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
       }
     }
 
