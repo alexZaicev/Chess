@@ -261,6 +261,6 @@ public class BoardPanel extends JPanel implements IBoardListener {
     }
     return (Color)
         CfgProvider.getInstance()
-            .get(white ? ConfigKey.COLOR_TILE_WHITE : ConfigKey.COLOR_TILE_BLACK);
+            .get(white ? ConfigKey.COLOR_TILE_BLACK : ConfigKey.COLOR_TILE_WHITE);
   }
 }

@@ -16,9 +16,13 @@ public interface IPiece extends Serializable {
 
   List<Tile> getAttackMoves(final Map<Tile, IPiece> board, final boolean isBot);
 
+  List<Tile> getAttackMoves(final Map<Tile, IPiece> board, final boolean isBot, final boolean filter);
+
   List<Tile> getAvailableMoves(final Map<Tile, IPiece> board);
 
   List<Tile> getAvailableMoves(final Map<Tile, IPiece> board, final boolean isBot);
+
+  List<Tile> getAvailableMoves(final Map<Tile, IPiece> board, final boolean isBot, final boolean filter);
 
   void postMoveUpdate();
 }

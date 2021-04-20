@@ -3,12 +3,34 @@ package com.alexz.chess.services;
 import com.alexz.chess.models.board.Tile;
 import com.alexz.chess.models.pieces.IPiece;
 import com.alexz.chess.models.pieces.PieceColor;
+import com.alexz.chess.models.pieces.Rook;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class PieceUtils {
+
+  public static void filterMovesToAvoidCheck(final Tile pos, final IPiece piece, final List<Tile> moves, final Map<Tile, IPiece> board) {
+    final List<Tile> filteredMoves = new ArrayList<>();
+    final PieceColor checked = BoardService.getInstance().getCheckedPieceColor(board, false);
+//    if (checked == PieceColor.NONE) {
+//      return;
+//    }
+
+    for (final Tile move : moves) {
+      final Map<Tile, IPiece> newBoard = new TreeMap<>(board);
+      newBoard.put(pos, null);
+      newBoard.put(move, piece);
+      final PieceColor pieceColor = BoardService.getInstance().getCheckedPieceColor(newBoard, false);
+      if (pieceColor == PieceColor.NONE || (checked == PieceColor.NONE && pieceColor != piece.getPieceColor())) {
+        filteredMoves.add(move);
+      }
+    }
+    moves.clear();
+    moves.addAll(filteredMoves);
+  }
 
   /**
    * @param board
@@ -181,12 +203,18 @@ public class PieceUtils {
 
     if (isBot) {
       if (isFirstMove) {
-        PieceUtils.addMove(column, row + 2, board, moves);
+        final Tile tile = Tile.valueOf(String.format("%s%d", column, row + 1));
+        if (board.get(tile) == null) {
+          PieceUtils.addMove(column, row + 2, board, moves);
+        }
       }
       PieceUtils.addMove(column, row + 1, board, moves);
     } else {
       if (isFirstMove) {
-        PieceUtils.addMove(column, row - 2, board, moves);
+        final Tile tile = Tile.valueOf(String.format("%s%d", column, row - 1));
+        if (board.get(tile) == null) {
+          PieceUtils.addMove(column, row - 2, board, moves);
+        }
       }
       PieceUtils.addMove(column, row - 1, board, moves);
     }
@@ -200,12 +228,17 @@ public class PieceUtils {
    * @return
    */
   public static List<Tile> getKingMoves(
-      final Map<Tile, IPiece> board, final Tile pos, final boolean isFirstMove) {
+      final Map<Tile, IPiece> board,
+      final Tile pos,
+      final boolean isFirstMove,
+      final PieceColor pieceColor) {
     final List<Tile> moves = new ArrayList<>();
     final char column = pos.name().charAt(0);
     final int row = Integer.parseInt(pos.name().substring(1));
 
-    // TODO check for special combination with Rook
+    if (isFirstMove) {
+      moves.addAll(getCastlingMoves(board, pos, pieceColor));
+    }
 
     addMove(column, row + 1, board, moves);
     addMove(column, row - 1, board, moves);
@@ -238,6 +271,55 @@ public class PieceUtils {
     addAttackMove((char) (column + 1), row - 1, board, moves, pieceColor);
     addAttackMove((char) (column - 1), row + 1, board, moves, pieceColor);
     addAttackMove((char) (column - 1), row - 1, board, moves, pieceColor);
+    return moves;
+  }
+
+  public static List<Tile> getCastlingMoves(
+      final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
+    final List<Tile> moves = new ArrayList<>();
+
+    final char column = pos.name().charAt(0);
+    final int row = Integer.parseInt(pos.name().substring(1));
+
+    final Tile leftRookPos = Tile.valueOf(String.format("A%d", row));
+    final Tile rightRookPos = Tile.valueOf(String.format("H%d", row));
+
+    final IPiece leftRook = board.get(leftRookPos);
+    final IPiece rightRook = board.get(rightRookPos);
+
+    if (leftRook instanceof Rook
+        && ((Rook) leftRook).isFirstMove()
+        && leftRook.getPieceColor() == pieceColor) {
+      boolean empty = true;
+      char tmpCol = column;
+      while (tmpCol > 'B') {
+        tmpCol -= 1;
+        if (board.get(Tile.valueOf(String.format("%s%d", tmpCol, row))) != null) {
+          empty = false;
+          break;
+        }
+      }
+      if (empty) {
+        addMove((char) (column - 2), row, board, moves);
+      }
+    }
+
+    if (rightRook instanceof Rook
+        && ((Rook) rightRook).isFirstMove()
+        && rightRook.getPieceColor() == pieceColor) {
+      boolean empty = true;
+      char tmpCol = column;
+      while (tmpCol < 'G') {
+        tmpCol += 1;
+        if (board.get(Tile.valueOf(String.format("%s%d", tmpCol, row))) != null) {
+          empty = false;
+          break;
+        }
+      }
+      if (empty) {
+        addMove((char) (column + 2), row, board, moves);
+      }
+    }
     return moves;
   }
 

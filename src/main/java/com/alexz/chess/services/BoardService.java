@@ -12,10 +12,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class BoardService extends ServiceBase {
 
@@ -79,6 +76,7 @@ public class BoardService extends ServiceBase {
 
         this.board.getAvailableAttackMoves().clear();
         this.board.getAvailableAttackMoves().addAll(piece.getAttackMoves(this.board.getBoard()));
+        this.checkWin();
         this.notifyListeners();
       } else {
         // attack move
@@ -106,13 +104,24 @@ public class BoardService extends ServiceBase {
   }
 
   public void onMoveAction(final Move move, final boolean isBot) {
-    if (!isBot && !this.board.getAvailableMoves().contains(move.getNewPosition())
+    if (!isBot
+        && !this.board.getAvailableMoves().contains(move.getNewPosition())
         && !this.board.getAvailableAttackMoves().contains(move.getNewPosition())) {
       this.selectedPiece = null;
       this.board.getAvailableMoves().clear();
       this.board.getAvailableAttackMoves().clear();
       this.notifyListeners();
       return;
+    }
+
+    // TODO: check if king is currently under check
+    // TODO: check if castling position ends up under check
+    if (move.getPiece() instanceof King) {
+      final King king = (King) move.getPiece();
+      if (king.isFirstMove()
+          && king.getCastlingMoves(this.board.getBoard()).contains(move.getNewPosition())) {
+        this.performCastlingMove(move);
+      }
     }
 
     this.board.getBoard().put(move.getOldPosition(), null);
@@ -136,15 +145,7 @@ public class BoardService extends ServiceBase {
     } else {
       this.board.setTurnHolder(PieceColor.WHITE);
     }
-
-    this.board.setCheck(this.getCheckedPieceColor(this.board.getBoard()));
-    final PieceColor winPieceColor =
-        this.getWinPieceColor(this.board.getBoard(), this.board.getCheck());
-    if (winPieceColor == this.board.getPlayerA().getPieceColor()) {
-      this.board.setState(BoardState.PLAYER_A_WINS);
-    } else if (winPieceColor == this.board.getPlayerB().getPieceColor()) {
-      this.board.setState(BoardState.PLAYER_B_WINS);
-    }
+    this.checkWin();
 
     this.notifyListeners();
   }
@@ -197,10 +198,14 @@ public class BoardService extends ServiceBase {
   }
 
   public PieceColor getCheckedPieceColor(final Map<Tile, IPiece> board) {
+    return this.getCheckedPieceColor(board, true);
+  }
+
+  public PieceColor getCheckedPieceColor(final Map<Tile, IPiece> board, final boolean filter) {
     final List<Tile> attackMoves = new ArrayList<>();
     for (final IPiece piece : board.values()) {
       if (piece != null) {
-        attackMoves.addAll(piece.getAttackMoves(this.board.getBoard()));
+        attackMoves.addAll(piece.getAttackMoves(board, false, filter));
       }
     }
     for (final Tile pos : attackMoves) {
@@ -223,25 +228,77 @@ public class BoardService extends ServiceBase {
       return kings.get(0).getPieceColor();
     }
 
-    for (final King king : kings) {
-      final List<Tile> moves = king.getAvailableMoves(board);
-      for (final Tile move : moves) {
-        final Map<Tile, IPiece> newBoard = new TreeMap<>(board);
-        newBoard.put(move, king);
-        final PieceColor pieceColor = this.getCheckedPieceColor(newBoard);
-        if (pieceColor == PieceColor.NONE) {
-          continue;
-        }
-        if (checked == pieceColor) {
-          return checked == PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE;
+    if (checked == PieceColor.NONE) {
+      return PieceColor.NONE;
+    }
+
+    final Map<ImmutablePair<Tile, IPiece>, List<Tile>> possibleMoves = new HashMap<>();
+    for (final Map.Entry<Tile, IPiece> e : this.board.getBoard().entrySet()) {
+      final Tile pos = e.getKey();
+      final IPiece piece = e.getValue();
+      if (piece != null && piece.getPieceColor() == checked) {
+        final List<Tile> moves = new ArrayList<>();
+        moves.addAll(piece.getAvailableMoves(this.board.getBoard()));
+        moves.addAll(piece.getAttackMoves(this.board.getBoard()));
+        if (!moves.isEmpty()) {
+          possibleMoves.put(ImmutablePair.of(pos, piece), moves);
         }
       }
     }
-    return PieceColor.NONE;
+
+    for (final Map.Entry<ImmutablePair<Tile, IPiece>, List<Tile>> e : possibleMoves.entrySet()) {
+      for (final Tile move : e.getValue()) {
+        final Map<Tile, IPiece> newBoard = new TreeMap<>(board);
+        newBoard.put(e.getKey().getLeft(), null);
+        newBoard.put(move, e.getKey().getRight());
+        final PieceColor pieceColor = this.getCheckedPieceColor(newBoard);
+        if (pieceColor != checked) {
+          return PieceColor.NONE;
+        }
+      }
+    }
+    return checked == PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE;
   }
 
-  public boolean isDraw(final Map<Tile, IPiece> board) {
-    // TODO
-    return false;
+  public void callDrawGame() {
+    this.board.setState(BoardState.DRAW);
+    this.notifyListeners();
+  }
+
+  private void checkWin() {
+    this.board.setCheck(this.getCheckedPieceColor(this.board.getBoard()));
+    _logger.debug("Player ["+this.board.getCheck()+"] is checked");
+    final PieceColor winPieceColor =
+            this.getWinPieceColor(this.board.getBoard(), this.board.getCheck());
+    if (winPieceColor == this.board.getPlayerA().getPieceColor()) {
+      this.board.setState(BoardState.PLAYER_A_WINS);
+      _logger.debug("Player A won");
+    } else if (winPieceColor == this.board.getPlayerB().getPieceColor()) {
+      this.board.setState(BoardState.PLAYER_B_WINS);
+      _logger.debug("Player B won");
+    }
+  }
+
+  private void performCastlingMove(final Move move) {
+    final char col = move.getNewPosition().name().charAt(0);
+    final int row = Integer.parseInt(move.getNewPosition().name().substring(1));
+    final char oldCol = move.getOldPosition().name().charAt(0);
+    final boolean leftSide = oldCol - col > 0;
+
+    final Tile rookOldPos;
+    final Tile rookNewPos;
+    final IPiece rook;
+    if (leftSide) {
+      rookOldPos = Tile.valueOf(String.format("A%d", row));
+      rook = this.board.getBoard().get(rookOldPos);
+      rookNewPos = Tile.valueOf(String.format("%s%d", (char) (col + 1), row));
+    } else {
+      rookOldPos = Tile.valueOf(String.format("H%d", row));
+      rook = this.board.getBoard().get(rookOldPos);
+      rookNewPos = Tile.valueOf(String.format("%s%d", (char) (col - 1), row));
+    }
+    ((Rook) rook).setFirstMove(false);
+    this.board.getBoard().put(rookOldPos, null);
+    this.board.getBoard().put(rookNewPos, rook);
   }
 }

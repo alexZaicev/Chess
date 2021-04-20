@@ -113,10 +113,10 @@ public enum Tile {
     final String column;
     if (isBot) {
       row = "1";
-      column = pieceColor == PieceColor.BLACK ? "E" : "D";
+      column = pieceColor == PieceColor.BLACK ? "D" : "E";
     } else {
       row = "8";
-      column = pieceColor == PieceColor.BLACK ? "D" : "E";
+      column = pieceColor == PieceColor.BLACK ? "E" : "D";
     }
     positions.add(Tile.valueOf(String.format("%s%s", column, row)));
     return positions;
@@ -128,10 +128,10 @@ public enum Tile {
     final String column;
     if (isBot) {
       row = "1";
-      column = pieceColor == PieceColor.BLACK ? "D" : "E";
+      column = pieceColor == PieceColor.BLACK ? "E" : "D";
     } else {
       row = "8";
-      column = pieceColor == PieceColor.BLACK ? "E" : "D";
+      column = pieceColor == PieceColor.BLACK ? "D" : "E";
     }
     positions.add(Tile.valueOf(String.format("%s%s", column, row)));
     return positions;

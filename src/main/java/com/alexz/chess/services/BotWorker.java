@@ -3,6 +3,7 @@ package com.alexz.chess.services;
 import com.alexz.chess.models.ConfigKey;
 import com.alexz.chess.models.board.Move;
 import com.alexz.chess.models.board.Tile;
+import com.alexz.chess.models.exceptions.DrawException;
 import com.alexz.chess.models.pieces.IPiece;
 import com.alexz.chess.models.players.BotBase;
 import org.apache.commons.lang3.RandomUtils;
@@ -20,12 +21,14 @@ public class BotWorker extends SwingWorker<Void, Void> {
   private final BotBase bot;
   private final Map<Tile, IPiece> boardState;
   private Move nextMove;
+  private boolean draw;
 
-  public BotWorker(BotBase bot, Map<Tile, IPiece> boardState) {
+  public BotWorker(final BotBase bot, final Map<Tile, IPiece> boardState) {
     this.bot = bot;
     this.boardState = boardState;
     this.minPause = CfgProvider.getInstance().getLong(ConfigKey.BOT_PAUSE_MIN);
     this.maxPause = CfgProvider.getInstance().getLong(ConfigKey.BOT_PAUSE_MAX);
+    this.draw = false;
   }
 
   @Override
@@ -49,6 +52,9 @@ public class BotWorker extends SwingWorker<Void, Void> {
           //
         }
       }
+    } catch (final DrawException ex) {
+      this.draw = true;
+      _logger.debug(ex.getMessage());
     } catch (final Exception ex) {
       _logger.error(ex);
     }
@@ -57,6 +63,10 @@ public class BotWorker extends SwingWorker<Void, Void> {
 
   @Override
   protected void done() {
+    if (draw) {
+      BoardService.getInstance().callDrawGame();
+      return;
+    }
     if (nextMove == null) {
       _logger.error("Failed to generate next move");
       return;

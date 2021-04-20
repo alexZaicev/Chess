@@ -36,11 +36,19 @@ public class King extends PieceBase {
 
   @Override
   public List<Tile> getAttackMoves(final Map<Tile, IPiece> board, final boolean isBot) {
+    return this.getAttackMoves(board, isBot, true);
+  }
+
+  @Override
+  public List<Tile> getAttackMoves(final Map<Tile, IPiece> board, final boolean isBot, final boolean filter) {
     final List<Tile> moves = new ArrayList<>();
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
       moves.addAll(PieceUtils.getKingAttackMoves(board, currentPos, this.pieceColor));
+      if (filter) {
+        PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
+      }
     }
     return moves;
   }
@@ -52,12 +60,29 @@ public class King extends PieceBase {
 
   @Override
   public List<Tile> getAvailableMoves(final Map<Tile, IPiece> board, final boolean isBot) {
+    return this.getAvailableMoves(board, isBot, true);
+  }
+
+  @Override
+  public List<Tile> getAvailableMoves(final Map<Tile, IPiece> board, final boolean isBot, final boolean filter) {
     final List<Tile> moves = new ArrayList<>();
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      moves.addAll(PieceUtils.getKingMoves(board, currentPos, this.firstMove));
+      moves.addAll(PieceUtils.getKingMoves(board, currentPos, this.firstMove, this.pieceColor));
+      PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
     }
+    return moves;
+  }
+
+  public List<Tile> getCastlingMoves(final Map<Tile, IPiece> board) {
+    final List<Tile> moves = new ArrayList<>();
+    final Tile currentPos = this.getCurrentPosition(board);
+
+    if (currentPos != null && this.isFirstMove()) {
+      moves.addAll(PieceUtils.getCastlingMoves(board, currentPos, this.pieceColor));
+    }
+
     return moves;
   }
 

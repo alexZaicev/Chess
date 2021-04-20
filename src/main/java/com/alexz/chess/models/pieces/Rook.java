@@ -15,6 +15,7 @@ public class Rook extends PieceBase {
 
   public Rook(final PieceColor color) {
     super(color);
+    this.firstMove = true;
   }
 
   @Override
@@ -43,13 +44,22 @@ public class Rook extends PieceBase {
 
   @Override
   public List<Tile> getAttackMoves(final Map<Tile, IPiece> board, final boolean isBot) {
-    final List<Tile> attackMoves = new ArrayList<>();
+    return this.getAttackMoves(board, isBot, true);
+  }
+
+  @Override
+  public List<Tile> getAttackMoves(
+      final Map<Tile, IPiece> board, final boolean isBot, final boolean filter) {
+    final List<Tile> moves = new ArrayList<>();
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      attackMoves.addAll(PieceUtils.getRookAttackMoves(board, currentPos, this.pieceColor));
+      moves.addAll(PieceUtils.getRookAttackMoves(board, currentPos, this.pieceColor));
+      if (filter) {
+        PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
+      }
     }
-    return attackMoves;
+    return moves;
   }
 
   @Override
@@ -59,11 +69,20 @@ public class Rook extends PieceBase {
 
   @Override
   public List<Tile> getAvailableMoves(final Map<Tile, IPiece> board, final boolean isBot) {
+    return this.getAvailableMoves(board, isBot, true);
+  }
+
+  @Override
+  public List<Tile> getAvailableMoves(
+      final Map<Tile, IPiece> board, final boolean isBot, final boolean filter) {
     final List<Tile> moves = new ArrayList<>();
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
       moves.addAll(PieceUtils.getRookMoves(board, currentPos, this.pieceColor));
+      if (filter) {
+        PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
+      }
     }
 
     return moves;
