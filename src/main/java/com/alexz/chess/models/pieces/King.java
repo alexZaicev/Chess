@@ -18,6 +18,11 @@ public class King extends PieceBase {
     this.firstMove = true;
   }
 
+  public King(final PieceColor pieceColor, final boolean firstMove) {
+    super(pieceColor);
+    this.firstMove = firstMove;
+  }
+
   @Override
   public String getIconPath() {
     final String root = super.getIconPath();

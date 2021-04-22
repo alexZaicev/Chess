@@ -15,40 +15,26 @@ public class PieceUtils {
   public static List<Tile> filterMovesToAvoidCheck(
       final Tile pos, final IPiece piece, final List<Tile> moves, final Map<Tile, IPiece> board) {
     final List<Tile> filteredMoves = new ArrayList<>();
-    final PieceColor checked = BoardService.getInstance().getCheckedPieceColor(board, false);
     for (final Tile move : moves) {
       final Map<Tile, IPiece> newBoard = new TreeMap<>(board);
       newBoard.put(pos, null);
       newBoard.put(move, piece);
-      final PieceColor pieceColor =
-          BoardService.getInstance().getCheckedPieceColor(newBoard, false);
-      if (pieceColor == PieceColor.NONE
-          || (checked == PieceColor.NONE && pieceColor != piece.getPieceColor())) {
+      final Map<PieceColor, Boolean> checkedPlayers =
+          BoardService.getInstance().getCheckedPlayers(newBoard, false);
+      if (!checkedPlayers.get(piece.getPieceColor())) {
         filteredMoves.add(move);
       }
     }
     return filteredMoves;
   }
 
-  /**
-   * @param board
-   * @param pos
-   * @return
-   */
-  public static List<Tile> getRookMoves(
-      final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
+  public static List<Tile> getRookMoves(final Map<Tile, IPiece> board, final Tile pos) {
     final List<Tile> moves = new ArrayList<>();
     moves.addAll(getVerticalMoves(board, pos));
     moves.addAll(getHorizontalMoves(board, pos));
     return moves;
   }
 
-  /**
-   * @param board
-   * @param pos
-   * @param pieceColor
-   * @return
-   */
   public static List<Tile> getRookAttackMoves(
       final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
     final List<Tile> moves = new ArrayList<>();
@@ -57,22 +43,10 @@ public class PieceUtils {
     return moves;
   }
 
-  /**
-   * @param board
-   * @param pos
-   * @return
-   */
-  public static List<Tile> getBishopMoves(
-      final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
+  public static List<Tile> getBishopMoves(final Map<Tile, IPiece> board, final Tile pos) {
     return getDiagonalMoves(board, pos);
   }
 
-  /**
-   * @param board
-   * @param pos
-   * @param pieceColor
-   * @return
-   */
   public static List<Tile> getBishopAttackMoves(
       final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
     return getDiagonalAttackMoves(board, pos, pieceColor);
@@ -87,8 +61,7 @@ public class PieceUtils {
     return moves;
   }
 
-  public static List<Tile> getQueenMoves(
-      final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
+  public static List<Tile> getQueenMoves(final Map<Tile, IPiece> board, final Tile pos) {
     final List<Tile> moves = new ArrayList<>();
     moves.addAll(getVerticalMoves(board, pos));
     moves.addAll(getHorizontalMoves(board, pos));
@@ -96,13 +69,7 @@ public class PieceUtils {
     return moves;
   }
 
-  /**
-   * @param board
-   * @param pos
-   * @return
-   */
-  public static List<Tile> getKnightMoves(
-      final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
+  public static List<Tile> getKnightMoves(final Map<Tile, IPiece> board, final Tile pos) {
     final List<Tile> moves = new ArrayList<>();
 
     final char column = pos.name().charAt(0);
@@ -123,12 +90,6 @@ public class PieceUtils {
     return moves;
   }
 
-  /**
-   * @param board
-   * @param pos
-   * @param pieceColor
-   * @return
-   */
   public static List<Tile> getKnightAttackMoves(
       final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
     final List<Tile> moves = new ArrayList<>();
@@ -151,13 +112,6 @@ public class PieceUtils {
     return moves;
   }
 
-  /**
-   * @param board
-   * @param pos
-   * @param isBot
-   * @param pieceColor
-   * @return
-   */
   public static List<Tile> getPawnAttackMoves(
       final Map<Tile, IPiece> board,
       final Tile pos,
@@ -182,13 +136,6 @@ public class PieceUtils {
     return moves;
   }
 
-  /**
-   * @param board
-   * @param pos
-   * @param isBot
-   * @param isFirstMove
-   * @return
-   */
   public static List<Tile> getPawnMoves(
       final Map<Tile, IPiece> board,
       final Tile pos,
@@ -219,12 +166,6 @@ public class PieceUtils {
     return moves;
   }
 
-  /**
-   * @param board
-   * @param pos
-   * @param isFirstMove
-   * @return
-   */
   public static List<Tile> getKingMoves(
       final Map<Tile, IPiece> board,
       final Tile pos,
@@ -249,12 +190,6 @@ public class PieceUtils {
     return moves;
   }
 
-  /**
-   * @param board
-   * @param pos
-   * @param pieceColor
-   * @return
-   */
   public static List<Tile> getKingAttackMoves(
       final Map<Tile, IPiece> board, final Tile pos, final PieceColor pieceColor) {
     final List<Tile> moves = new ArrayList<>();

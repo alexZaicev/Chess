@@ -29,13 +29,13 @@ public class TextArea extends JTextArea {
   }
 
   @Override
-  public void setSize(int width, int height) {
+  public void setSize(final int width, final int height) {
     super.setSize(width, height);
     this.setPreferredSize(new Dimension(width, height));
   }
 
   @Override
-  public void setSize(Dimension d) {
+  public void setSize(final Dimension d) {
     super.setSize(d);
     this.setPreferredSize(d);
   }

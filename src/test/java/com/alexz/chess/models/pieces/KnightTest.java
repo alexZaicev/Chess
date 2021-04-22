@@ -1,11 +1,13 @@
 package com.alexz.chess.models.pieces;
 
-import com.alexz.chess.models.TestHelper;
+import com.alexz.chess.TestHelper;
 import com.alexz.chess.models.board.Tile;
 import com.alexz.chess.services.PieceUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +16,7 @@ import java.util.Map;
 
 public class KnightTest {
 
-  static final Map<Tile, IPiece> BOARD = TestHelper.board();
+  static final Map<Tile, IPiece> BOARD = TestHelper.emptyBoard();
 
   @BeforeEach
   void setup() {
@@ -52,44 +54,41 @@ public class KnightTest {
     moves.add(Tile.B7);
     moves.add(Tile.B6);
 
-    TestHelper.pieceUtilsMock
-        .when(() -> PieceUtils.getKnightMoves(BOARD, Tile.B8, knight.pieceColor))
-        .thenReturn(moves);
-    TestHelper.pieceUtilsMock
-        .when(() -> PieceUtils.filterMovesToAvoidCheck(Tile.B8, knight, moves, BOARD))
-        .thenReturn(moves);
+    try (final MockedStatic<PieceUtils> pieceUtilsMock = Mockito.mockStatic(PieceUtils.class)) {
+      pieceUtilsMock.when(() -> PieceUtils.getKnightMoves(BOARD, Tile.B8)).thenReturn(moves);
+      pieceUtilsMock
+          .when(() -> PieceUtils.filterMovesToAvoidCheck(Tile.B8, knight, moves, BOARD))
+          .thenReturn(moves);
 
-    TestHelper.validate(moves, knight.getAvailableMoves(BOARD));
-    TestHelper.validate(moves, knight.getAvailableMoves(BOARD, false));
-    TestHelper.validate(moves, knight.getAvailableMoves(BOARD, false, true));
-    TestHelper.validate(moves, knight.getAvailableMoves(BOARD, false, false));
-
+      TestHelper.validatePositions(moves, knight.getAvailableMoves(BOARD));
+      TestHelper.validatePositions(moves, knight.getAvailableMoves(BOARD, false));
+      TestHelper.validatePositions(moves, knight.getAvailableMoves(BOARD, false, true));
+      TestHelper.validatePositions(moves, knight.getAvailableMoves(BOARD, false, false));
+    }
     BOARD.put(Tile.B8, null);
     BOARD.put(Tile.B1, knight);
     moves.clear();
     moves.add(Tile.B2);
     moves.add(Tile.B3);
+    try (final MockedStatic<PieceUtils> pieceUtilsMock = Mockito.mockStatic(PieceUtils.class)) {
+      pieceUtilsMock.when(() -> PieceUtils.getKnightMoves(BOARD, Tile.B1)).thenReturn(moves);
+      pieceUtilsMock
+          .when(() -> PieceUtils.filterMovesToAvoidCheck(Tile.B1, knight, moves, BOARD))
+          .thenReturn(moves);
 
-    TestHelper.pieceUtilsMock
-        .when(() -> PieceUtils.getKnightMoves(BOARD, Tile.B1, knight.pieceColor))
-        .thenReturn(moves);
-    TestHelper.pieceUtilsMock
-        .when(() -> PieceUtils.filterMovesToAvoidCheck(Tile.B1, knight, moves, BOARD))
-        .thenReturn(moves);
+      TestHelper.validatePositions(moves, knight.getAvailableMoves(BOARD, true));
+      TestHelper.validatePositions(moves, knight.getAvailableMoves(BOARD, true, true));
+      TestHelper.validatePositions(moves, knight.getAvailableMoves(BOARD, true, false));
+    }
 
-    TestHelper.validate(moves, knight.getAvailableMoves(BOARD, true));
-    TestHelper.validate(moves, knight.getAvailableMoves(BOARD, true, true));
-    TestHelper.validate(moves, knight.getAvailableMoves(BOARD, true, false));
-
-    TestHelper.pieceUtilsMock
-        .when(() -> PieceUtils.getKnightMoves(BOARD, Tile.B1, knight.pieceColor))
-        .thenReturn(moves);
-    TestHelper.pieceUtilsMock
-        .when(() -> PieceUtils.filterMovesToAvoidCheck(Tile.B1, knight, moves, BOARD))
-        .thenReturn(new ArrayList<>());
-
-    moves.clear();
-    TestHelper.validate(moves, knight.getAvailableMoves(BOARD, true, true));
+    try (final MockedStatic<PieceUtils> pieceUtilsMock = Mockito.mockStatic(PieceUtils.class)) {
+      pieceUtilsMock.when(() -> PieceUtils.getKnightMoves(BOARD, Tile.B1)).thenReturn(moves);
+      pieceUtilsMock
+          .when(() -> PieceUtils.filterMovesToAvoidCheck(Tile.B1, knight, moves, BOARD))
+          .thenReturn(moves);
+      moves.clear();
+      TestHelper.validatePositions(moves, knight.getAvailableMoves(BOARD, true, true));
+    }
   }
 
   @Test
@@ -101,17 +100,19 @@ public class KnightTest {
     moves.add(Tile.B7);
     moves.add(Tile.B6);
 
-    TestHelper.pieceUtilsMock
-        .when(() -> PieceUtils.getKnightAttackMoves(BOARD, Tile.B8, knight.pieceColor))
-        .thenReturn(moves);
-    TestHelper.pieceUtilsMock
-        .when(() -> PieceUtils.filterMovesToAvoidCheck(Tile.B8, knight, moves, BOARD))
-        .thenReturn(moves);
+    try (final MockedStatic<PieceUtils> pieceUtilsMock = Mockito.mockStatic(PieceUtils.class)) {
+      pieceUtilsMock
+          .when(() -> PieceUtils.getKnightAttackMoves(BOARD, Tile.B8, knight.pieceColor))
+          .thenReturn(moves);
+      pieceUtilsMock
+          .when(() -> PieceUtils.filterMovesToAvoidCheck(Tile.B8, knight, moves, BOARD))
+          .thenReturn(moves);
 
-    TestHelper.validate(moves, knight.getAttackMoves(BOARD));
-    TestHelper.validate(moves, knight.getAttackMoves(BOARD, false));
-    TestHelper.validate(moves, knight.getAttackMoves(BOARD, false, true));
-    TestHelper.validate(moves, knight.getAttackMoves(BOARD, false, false));
+      TestHelper.validatePositions(moves, knight.getAttackMoves(BOARD));
+      TestHelper.validatePositions(moves, knight.getAttackMoves(BOARD, false));
+      TestHelper.validatePositions(moves, knight.getAttackMoves(BOARD, false, true));
+      TestHelper.validatePositions(moves, knight.getAttackMoves(BOARD, false, false));
+    }
 
     BOARD.put(Tile.B8, null);
     BOARD.put(Tile.B1, knight);
@@ -119,25 +120,29 @@ public class KnightTest {
     moves.add(Tile.B2);
     moves.add(Tile.B3);
 
-    TestHelper.pieceUtilsMock
-        .when(() -> PieceUtils.getKnightAttackMoves(BOARD, Tile.B1, knight.pieceColor))
-        .thenReturn(moves);
-    TestHelper.pieceUtilsMock
-        .when(() -> PieceUtils.filterMovesToAvoidCheck(Tile.B1, knight, moves, BOARD))
-        .thenReturn(moves);
+    try (final MockedStatic<PieceUtils> pieceUtilsMock = Mockito.mockStatic(PieceUtils.class)) {
+      pieceUtilsMock
+          .when(() -> PieceUtils.getKnightAttackMoves(BOARD, Tile.B1, knight.pieceColor))
+          .thenReturn(moves);
+      pieceUtilsMock
+          .when(() -> PieceUtils.filterMovesToAvoidCheck(Tile.B1, knight, moves, BOARD))
+          .thenReturn(moves);
 
-    TestHelper.validate(moves, knight.getAttackMoves(BOARD, true));
-    TestHelper.validate(moves, knight.getAttackMoves(BOARD, true, true));
-    TestHelper.validate(moves, knight.getAttackMoves(BOARD, true, false));
+      TestHelper.validatePositions(moves, knight.getAttackMoves(BOARD, true));
+      TestHelper.validatePositions(moves, knight.getAttackMoves(BOARD, true, true));
+      TestHelper.validatePositions(moves, knight.getAttackMoves(BOARD, true, false));
+    }
 
-    TestHelper.pieceUtilsMock
-        .when(() -> PieceUtils.getKnightAttackMoves(BOARD, Tile.B1, knight.pieceColor))
-        .thenReturn(moves);
-    TestHelper.pieceUtilsMock
-        .when(() -> PieceUtils.filterMovesToAvoidCheck(Tile.B1, knight, moves, BOARD))
-        .thenReturn(new ArrayList<>());
+    try (final MockedStatic<PieceUtils> pieceUtilsMock = Mockito.mockStatic(PieceUtils.class)) {
+      pieceUtilsMock
+          .when(() -> PieceUtils.getKnightAttackMoves(BOARD, Tile.B1, knight.pieceColor))
+          .thenReturn(moves);
+      pieceUtilsMock
+          .when(() -> PieceUtils.filterMovesToAvoidCheck(Tile.B1, knight, moves, BOARD))
+          .thenReturn(moves);
 
-    moves.clear();
-    TestHelper.validate(moves, knight.getAttackMoves(BOARD, true, true));
+      moves.clear();
+      TestHelper.validatePositions(moves, knight.getAttackMoves(BOARD, true, true));
+    }
   }
 }

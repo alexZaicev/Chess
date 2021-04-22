@@ -67,7 +67,7 @@ public class Queen extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      moves.addAll(PieceUtils.getQueenMoves(board, currentPos, this.pieceColor));
+      moves.addAll(PieceUtils.getQueenMoves(board, currentPos));
       if (filter) {
         return PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
       }

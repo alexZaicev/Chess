@@ -67,7 +67,7 @@ public class Bishop extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      moves.addAll(PieceUtils.getBishopMoves(board, currentPos, this.pieceColor));
+      moves.addAll(PieceUtils.getBishopMoves(board, currentPos));
       if (filter) {
         return PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
       }

@@ -1,6 +1,6 @@
 package com.alexz.chess.models.board;
 
-import com.alexz.chess.models.TestHelper;
+import com.alexz.chess.TestHelper;
 import com.alexz.chess.models.pieces.PieceColor;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ public class TileTest {
     expected.add(Tile.F2);
     expected.add(Tile.G2);
     expected.add(Tile.H2);
-    TestHelper.validate(expected, Tile.getInitialPawnPositions(true));
+    TestHelper.validatePositions(expected, Tile.getInitialPawnPositions(true));
 
     expected.clear();
     expected.add(Tile.A7);
@@ -31,7 +31,7 @@ public class TileTest {
     expected.add(Tile.F7);
     expected.add(Tile.G7);
     expected.add(Tile.H7);
-    TestHelper.validate(expected, Tile.getInitialPawnPositions(false));
+    TestHelper.validatePositions(expected, Tile.getInitialPawnPositions(false));
   }
 
   @Test
@@ -39,12 +39,12 @@ public class TileTest {
     final List<Tile> expected = new ArrayList<>();
     expected.add(Tile.A1);
     expected.add(Tile.H1);
-    TestHelper.validate(expected, Tile.getInitialRookPositions(true));
+    TestHelper.validatePositions(expected, Tile.getInitialRookPositions(true));
 
     expected.clear();
     expected.add(Tile.A8);
     expected.add(Tile.H8);
-    TestHelper.validate(expected, Tile.getInitialRookPositions(false));
+    TestHelper.validatePositions(expected, Tile.getInitialRookPositions(false));
   }
 
   @Test
@@ -52,12 +52,12 @@ public class TileTest {
     final List<Tile> expected = new ArrayList<>();
     expected.add(Tile.B1);
     expected.add(Tile.G1);
-    TestHelper.validate(expected, Tile.getInitialKnightPositions(true));
+    TestHelper.validatePositions(expected, Tile.getInitialKnightPositions(true));
 
     expected.clear();
     expected.add(Tile.B8);
     expected.add(Tile.G8);
-    TestHelper.validate(expected, Tile.getInitialKnightPositions(false));
+    TestHelper.validatePositions(expected, Tile.getInitialKnightPositions(false));
   }
 
   @Test
@@ -65,49 +65,49 @@ public class TileTest {
     final List<Tile> expected = new ArrayList<>();
     expected.add(Tile.C1);
     expected.add(Tile.F1);
-    TestHelper.validate(expected, Tile.getInitialBishopPositions(true));
+    TestHelper.validatePositions(expected, Tile.getInitialBishopPositions(true));
 
     expected.clear();
     expected.add(Tile.C8);
     expected.add(Tile.F8);
-    TestHelper.validate(expected, Tile.getInitialBishopPositions(false));
+    TestHelper.validatePositions(expected, Tile.getInitialBishopPositions(false));
   }
 
   @Test
   void testGetInitialQueenPositions() {
     final List<Tile> expected = new ArrayList<>();
     expected.add(Tile.E1);
-    TestHelper.validate(expected, Tile.getInitialQueenPositions(true, PieceColor.WHITE));
+    TestHelper.validatePositions(expected, Tile.getInitialQueenPositions(true, PieceColor.WHITE));
 
     expected.clear();
     expected.add(Tile.D1);
-    TestHelper.validate(expected, Tile.getInitialQueenPositions(true, PieceColor.BLACK));
+    TestHelper.validatePositions(expected, Tile.getInitialQueenPositions(true, PieceColor.BLACK));
 
     expected.clear();
     expected.add(Tile.D8);
-    TestHelper.validate(expected, Tile.getInitialQueenPositions(false, PieceColor.WHITE));
+    TestHelper.validatePositions(expected, Tile.getInitialQueenPositions(false, PieceColor.WHITE));
 
     expected.clear();
     expected.add(Tile.E8);
-    TestHelper.validate(expected, Tile.getInitialQueenPositions(false, PieceColor.BLACK));
+    TestHelper.validatePositions(expected, Tile.getInitialQueenPositions(false, PieceColor.BLACK));
   }
 
   @Test
   void testGetInitialKingPositions() {
     final List<Tile> expected = new ArrayList<>();
     expected.add(Tile.D1);
-    TestHelper.validate(expected, Tile.getInitialKingPositions(true, PieceColor.WHITE));
+    TestHelper.validatePositions(expected, Tile.getInitialKingPositions(true, PieceColor.WHITE));
 
     expected.clear();
     expected.add(Tile.E1);
-    TestHelper.validate(expected, Tile.getInitialKingPositions(true, PieceColor.BLACK));
+    TestHelper.validatePositions(expected, Tile.getInitialKingPositions(true, PieceColor.BLACK));
 
     expected.clear();
     expected.add(Tile.E8);
-    TestHelper.validate(expected, Tile.getInitialKingPositions(false, PieceColor.WHITE));
+    TestHelper.validatePositions(expected, Tile.getInitialKingPositions(false, PieceColor.WHITE));
 
     expected.clear();
     expected.add(Tile.D8);
-    TestHelper.validate(expected, Tile.getInitialKingPositions(false, PieceColor.BLACK));
+    TestHelper.validatePositions(expected, Tile.getInitialKingPositions(false, PieceColor.BLACK));
   }
 }

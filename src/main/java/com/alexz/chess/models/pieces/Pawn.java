@@ -18,6 +18,11 @@ public class Pawn extends PieceBase {
     this.firstMove = true;
   }
 
+  public Pawn(final PieceColor color, final boolean firstMove) {
+    super(color);
+    this.firstMove = firstMove;
+  }
+
   @Override
   public String toString() {
     return "P";

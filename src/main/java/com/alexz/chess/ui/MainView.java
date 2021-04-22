@@ -3,17 +3,11 @@ package com.alexz.chess.ui;
 import com.alexz.chess.models.ConfigKey;
 import com.alexz.chess.services.BoardService;
 import com.alexz.chess.services.CfgProvider;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
-public class MainView extends JFrame implements WindowListener {
-
-  private static final Logger _logger = LogManager.getLogger(MainView.class);
+public class MainView extends JFrame {
 
   public MainView() {
     super(
@@ -28,7 +22,6 @@ public class MainView extends JFrame implements WindowListener {
 
   private void compose() {
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    this.addWindowListener(this);
     this.setLayout(null);
     this.setResizable(false);
     this.setVisible(true);
@@ -46,25 +39,4 @@ public class MainView extends JFrame implements WindowListener {
     BoardService.getInstance().registerListener(boardPanel);
     this.add(boardPanel);
   }
-
-  @Override
-  public void windowOpened(WindowEvent e) {}
-
-  @Override
-  public void windowClosing(WindowEvent e) {}
-
-  @Override
-  public void windowClosed(WindowEvent e) {}
-
-  @Override
-  public void windowIconified(WindowEvent e) {}
-
-  @Override
-  public void windowDeiconified(WindowEvent e) {}
-
-  @Override
-  public void windowActivated(WindowEvent e) {}
-
-  @Override
-  public void windowDeactivated(WindowEvent e) {}
 }

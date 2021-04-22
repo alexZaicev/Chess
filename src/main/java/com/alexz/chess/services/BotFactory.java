@@ -14,9 +14,10 @@ public class BotFactory {
   public static BotBase getBot(final PieceColor pieceColor, final Difficulty difficulty) {
     switch (difficulty) {
       case EASY:
+        return new NaiveBot(pieceColor);
       case MODERATE:
       case HARD:
-        return new NaiveBot(pieceColor);
+        return null;
     }
     _logger.warn("Could not construct bot for an unsupported difficulty [" + difficulty + "]");
     return new NaiveBot(pieceColor);

@@ -1,7 +1,7 @@
 package com.alexz.chess.models.players;
 
+import com.alexz.chess.TestHelper;
 import com.alexz.chess.models.Difficulty;
-import com.alexz.chess.models.TestHelper;
 import com.alexz.chess.models.board.Move;
 import com.alexz.chess.models.board.Tile;
 import com.alexz.chess.models.exceptions.DrawException;
@@ -22,7 +22,7 @@ public class NaiveBotTest {
 
   static final IPiece p1Mock = Mockito.mock(IPiece.class);
   static final IPiece p2Mock = Mockito.mock(IPiece.class);
-  static final Map<Tile, IPiece> BOARD = TestHelper.board();
+  static final Map<Tile, IPiece> BOARD = TestHelper.emptyBoard();
 
   @BeforeEach
   void setup() {

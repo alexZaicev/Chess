@@ -18,6 +18,11 @@ public class Rook extends PieceBase {
     this.firstMove = true;
   }
 
+  public Rook(final PieceColor pieceColor, final boolean firstMove) {
+    super(pieceColor);
+    this.firstMove = firstMove;
+  }
+
   @Override
   public String toString() {
     return "R";
@@ -79,7 +84,7 @@ public class Rook extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      moves.addAll(PieceUtils.getRookMoves(board, currentPos, this.pieceColor));
+      moves.addAll(PieceUtils.getRookMoves(board, currentPos));
       if (filter) {
         return PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
       }

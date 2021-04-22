@@ -24,7 +24,7 @@ public class BoardService extends ServiceBase {
   private Difficulty difficulty;
   private ImmutablePair<Tile, IPiece> selectedPiece;
 
-  public BoardService() {
+  private BoardService() {
     this.listeners = new ArrayList<>();
     this.board = new Board();
     this.difficulty = Difficulty.valueOf(CfgProvider.getInstance().getStr(ConfigKey.DIFFICULTY));
@@ -39,6 +39,10 @@ public class BoardService extends ServiceBase {
       }
     }
     return result;
+  }
+
+  public void clearNotifiers() {
+    this.listeners.clear();
   }
 
   public void registerListener(final IBoardListener listener) {
@@ -56,6 +60,10 @@ public class BoardService extends ServiceBase {
     for (final IBoardListener l : listeners) {
       l.notify(this.board);
     }
+  }
+
+  public Board getBoard() {
+    return board;
   }
 
   public Difficulty getDifficulty() {
@@ -78,25 +86,19 @@ public class BoardService extends ServiceBase {
         this.board.getAvailableAttackMoves().addAll(piece.getAttackMoves(this.board.getBoard()));
         this.checkWin();
         this.notifyListeners();
-      } else {
-        // attack move
-        final Move move =
-            new Move(
-                this.board.getPlayerA().getPieceColor(),
-                this.selectedPiece.getLeft(),
-                tile,
-                this.selectedPiece.getRight());
-        this.onMoveAction(move);
+        return;
       }
-    } else {
-      final Move move =
-          new Move(
-              this.board.getPlayerA().getPieceColor(),
-              this.selectedPiece.getLeft(),
-              tile,
-              this.selectedPiece.getRight());
-      this.onMoveAction(move);
     }
+    this.onMoveAction(
+        this.board.getPlayerA().getPieceColor(),
+        this.selectedPiece.getLeft(),
+        tile,
+        this.selectedPiece.getRight());
+  }
+
+  public void onMoveAction(
+      final PieceColor pieceColor, final Tile oldPos, final Tile newPos, final IPiece piece) {
+    this.onMoveAction(new Move(pieceColor, oldPos, newPos, piece));
   }
 
   public void onMoveAction(final Move move) {
@@ -197,29 +199,36 @@ public class BoardService extends ServiceBase {
     }
   }
 
-  public PieceColor getCheckedPieceColor(final Map<Tile, IPiece> board) {
-    return this.getCheckedPieceColor(board, true);
+  public Map<PieceColor, Boolean> getCheckedPlayers(final Map<Tile, IPiece> board) {
+    return this.getCheckedPlayers(board, true);
   }
 
-  public PieceColor getCheckedPieceColor(final Map<Tile, IPiece> board, final boolean filter) {
-    final List<Tile> attackMoves = new ArrayList<>();
+  public Map<PieceColor, Boolean> getCheckedPlayers(
+      final Map<Tile, IPiece> board, final boolean filter) {
+    final Map<PieceColor, Boolean> result = new HashMap<>();
+    result.put(PieceColor.WHITE, false);
+    result.put(PieceColor.BLACK, false);
+
     for (final IPiece piece : board.values()) {
       if (piece != null) {
-        attackMoves.addAll(piece.getAttackMoves(board, false, filter));
+        final boolean isBot = this.board.getPlayerB().getPieceColor() == piece.getPieceColor();
+        final List<Tile> moves = piece.getAttackMoves(board, isBot, filter);
+        for (final Tile pos : moves) {
+          final IPiece attackedPiece = board.get(pos);
+          if (piece.getPieceColor() != attackedPiece.getPieceColor()
+              && attackedPiece instanceof King) {
+            result.put(attackedPiece.getPieceColor(), true);
+          }
+        }
       }
     }
-    for (final Tile pos : attackMoves) {
-      final IPiece piece = board.get(pos);
-      if (piece instanceof King) {
-        return piece.getPieceColor();
-      }
-    }
-    return PieceColor.NONE;
+    return result;
   }
 
-  public PieceColor getWinPieceColor(final Map<Tile, IPiece> board, final PieceColor checked) {
+  public PieceColor getWinPieceColor(
+      final Map<Tile, IPiece> board, final PieceColor checked, final PieceColor playerAColor) {
     final List<King> kings = new ArrayList<>();
-    for (final IPiece piece : this.board.getBoard().values()) {
+    for (final IPiece piece : board.values()) {
       if (piece instanceof King) {
         kings.add((King) piece);
       }
@@ -233,31 +242,36 @@ public class BoardService extends ServiceBase {
     }
 
     final Map<ImmutablePair<Tile, IPiece>, List<Tile>> possibleMoves = new HashMap<>();
-    for (final Map.Entry<Tile, IPiece> e : this.board.getBoard().entrySet()) {
+    for (final Map.Entry<Tile, IPiece> e : board.entrySet()) {
       final Tile pos = e.getKey();
       final IPiece piece = e.getValue();
       if (piece != null && piece.getPieceColor() == checked) {
         final List<Tile> moves = new ArrayList<>();
-        moves.addAll(piece.getAvailableMoves(this.board.getBoard()));
-        moves.addAll(piece.getAttackMoves(this.board.getBoard()));
+        final boolean isBot = piece.getPieceColor() != playerAColor;
+        moves.addAll(piece.getAvailableMoves(board, isBot));
+        moves.addAll(piece.getAttackMoves(board, isBot));
         if (!moves.isEmpty()) {
           possibleMoves.put(ImmutablePair.of(pos, piece), moves);
         }
       }
     }
 
+    final PieceColor opponent = checked == PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE;
     for (final Map.Entry<ImmutablePair<Tile, IPiece>, List<Tile>> e : possibleMoves.entrySet()) {
       for (final Tile move : e.getValue()) {
         final Map<Tile, IPiece> newBoard = new TreeMap<>(board);
         newBoard.put(e.getKey().getLeft(), null);
         newBoard.put(move, e.getKey().getRight());
-        final PieceColor pieceColor = this.getCheckedPieceColor(newBoard);
-        if (pieceColor != checked) {
+        final Map<PieceColor, Boolean> checkedPlayers = this.getCheckedPlayers(newBoard);
+        if (checkedPlayers.get(checked)) {
+          continue;
+        }
+        if (!checkedPlayers.get(checked) && !checkedPlayers.get(opponent)) {
           return PieceColor.NONE;
         }
       }
     }
-    return checked == PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE;
+    return opponent;
   }
 
   public void callDrawGame() {
@@ -266,10 +280,18 @@ public class BoardService extends ServiceBase {
   }
 
   private void checkWin() {
-    this.board.setCheck(this.getCheckedPieceColor(this.board.getBoard()));
-    _logger.debug("Player ["+this.board.getCheck()+"] is checked");
+    this.board.setCheck(PieceColor.NONE);
+    final Map<PieceColor, Boolean> checks = this.getCheckedPlayers(this.board.getBoard());
+    for (final Map.Entry<PieceColor, Boolean> e : checks.entrySet()) {
+      if (e.getValue()) {
+        this.board.setCheck(e.getKey());
+        break;
+      }
+    }
+    _logger.debug("Player [" + this.board.getCheck() + "] is checked");
     final PieceColor winPieceColor =
-            this.getWinPieceColor(this.board.getBoard(), this.board.getCheck());
+        this.getWinPieceColor(
+            this.board.getBoard(), this.board.getCheck(), this.board.getPlayerA().getPieceColor());
     if (winPieceColor == this.board.getPlayerA().getPieceColor()) {
       this.board.setState(BoardState.PLAYER_A_WINS);
       _logger.debug("Player A won");

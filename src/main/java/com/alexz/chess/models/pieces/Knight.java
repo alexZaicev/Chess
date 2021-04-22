@@ -67,7 +67,7 @@ public class Knight extends PieceBase {
     final Tile currentPos = this.getCurrentPosition(board);
 
     if (currentPos != null) {
-      moves.addAll(PieceUtils.getKnightMoves(board, currentPos, this.pieceColor));
+      moves.addAll(PieceUtils.getKnightMoves(board, currentPos));
       if (filter) {
         return PieceUtils.filterMovesToAvoidCheck(currentPos, this, moves, board);
       }

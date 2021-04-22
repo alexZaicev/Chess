@@ -34,12 +34,8 @@ public class CfgProvider extends ServiceBase {
 
   @Override
   public void init() {
-    final InputStream stream = this.getClass().getClassLoader().getResourceAsStream(CFG_FILE);
-    if (stream == null) {
-      _logger.error("Failed to load configuration from file");
-      System.exit(1);
-    }
     try {
+      final InputStream stream = this.getClass().getClassLoader().getResourceAsStream(CFG_FILE);
       final Properties props = new Properties();
       props.load(stream);
       for (final Object key : props.keySet()) {
@@ -84,14 +80,6 @@ public class CfgProvider extends ServiceBase {
 
   public long getLong(final ConfigKey key) {
     return Long.parseLong(this.getStr(key));
-  }
-
-  public double getDouble(final ConfigKey key) {
-    return Double.parseDouble(this.getStr(key));
-  }
-
-  public float getFloat(final ConfigKey key) {
-    return Float.parseFloat(this.getStr(key));
   }
 
   private Font parseFont(final String val) {
